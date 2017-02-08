@@ -1,5 +1,7 @@
 TODO
 =============
-Passport: InitialData, OneChannelData, TelemetryData;
+Passport: add InitialData, OneChannelData, TelemetryData;
 
-ProectionPassport: new getters;
+ProectionPassport: add new getters;
+
+Image: fix bugs;
