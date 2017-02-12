@@ -1,7 +1,9 @@
 #pragma once
 
 #include <fstream>
+#include <iostream>
 #include <string>
+#include <SDL2/SDL.h>
 
 namespace satellite {
 
@@ -21,6 +23,7 @@ public:
   inline const unsigned short* operator[] ( unsigned short index ) const {
     return pImage[index];
   };
+  void display ( unsigned short width, unsigned short height, unsigned short x0, unsigned short y0, unsigned short dx, unsigned short dy );
 private:
   unsigned short iWidth, iHeight;
   unsigned short** pImage;
