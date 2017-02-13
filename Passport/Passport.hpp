@@ -72,17 +72,17 @@ public:
   const Time getTime () const;
   const std::string getDataType () const;
 protected:
-  uint8_t FFh1_FORMAT;  //Тип формата - FFh1
-  char SAT2_NAME[14];   //Название ИСЗ2, заглавными буквами
-  uint32_t SAT_ID;      //Идентификатор ИСЗ (см. enum SAT_ID)
-  uint32_t NODE_NUM;    //Номер витка
-  uint16_t DATE_YEAR;   //Дата начала приема (UTC) --- год
-  uint16_t DATE_DAY;    //                         --- день года (1-based)
-  uint32_t DATE_TIME;   //                         --- время начала приема(миллисекунд с начала дня)
-  uint8_t RESERVE_1[8]; //Резерв
-  uint8_t SERVICE_1[22];//Служебные
-  uint8_t RESERVE_2[2]; //Резерв
-  uint8_t DATA_TYPE[2]; //Тип данных (см. комментарий "Типы данных")
+  uint8_t FFh1_FORMAT;  //0 -- Тип формата - FFh1
+  char SAT2_NAME[14];   //1 -- Название ИСЗ2, заглавными буквами
+  uint32_t SAT_ID;      //14 -- Идентификатор ИСЗ (см. enum SAT_ID)
+  uint32_t NODE_NUM;    //18 -- Номер витка
+  uint16_t DATE_YEAR;   //22 -- Дата начала приема (UTC) --- год
+  uint16_t DATE_DAY;    //24 --                    --- день года (1-based)
+  uint32_t DATE_TIME;   //26 --                    --- время начала приема(миллисекунд с начала дня)
+  uint8_t RESERVE_1[8]; //30 -- Резерв
+  uint8_t SERVICE_1[22];//38 -- Служебные
+  uint8_t RESERVE_2[2]; //60 -- Резерв
+  uint8_t DATA_TYPE[2]; //62 -- Тип данных (см. комментарий "Типы данных")
   friend std::ifstream& operator>> ( std::ifstream& file, passport::Default& pass ) {
 
     if (!file.is_open()) return file;
@@ -142,6 +142,23 @@ protected:
 
     return file;
   }
+  friend std::ofstream& operator< ( std::ofstream& file, const satellite::passport::Default& pass ) {
+    if (!file.is_open()) return file;
+
+    file.write((char*)(&(pass.FFh1_FORMAT)), 1);
+    file.write((char*)(pass.SAT2_NAME), 13);
+    file.write((char*)(&(pass.SAT_ID)), sizeof(SAT_ID));
+    file.write((char*)(&(pass.NODE_NUM)), sizeof(NODE_NUM));
+    file.write((char*)(&(pass.DATE_YEAR)), sizeof(DATE_YEAR));
+    file.write((char*)(&(pass.DATE_DAY)), sizeof(DATE_DAY));
+    file.write((char*)(&(pass.DATE_TIME)), sizeof(DATE_TIME));
+    file.write((char*)(pass.RESERVE_1), 8);
+    file.write((char*)(pass.SERVICE_1), 22);
+    file.write((char*)(pass.RESERVE_2), 2);
+    file.write((char*)(pass.DATA_TYPE), 2);
+
+    return file;
+  }
 };
 #pragma pack(pop)
 
@@ -175,6 +192,61 @@ public:
   }
   inline const float getLongitude () {
     return LONGITUDE;
+  }
+  /*Вывод пасспорта проекции в файл в бинарном виде*/
+  friend std::ofstream& operator< ( std::ofstream& file, const satellite::passport::Proection& pass ) {
+    if (!file.is_open())
+      return file;
+
+      file.write((char *)(&(pass.FFh1_FORMAT)), 1);
+      file.write((char*)(pass.SAT2_NAME), 13);
+      file.write((char *)(&(pass.SAT_ID)), sizeof(SAT_ID));
+      file.write((char *)(&(pass.NODE_NUM)), sizeof(NODE_NUM));
+      file.write((char *)(&(pass.DATE_YEAR)), sizeof(DATE_YEAR));
+      file.write((char *)(&(pass.DATE_DAY)), sizeof(DATE_DAY));
+      file.write((char *)(&(pass.DATE_TIME)), sizeof(DATE_TIME));
+      file.write((char *)(pass.RESERVE_1), 8);
+      file.write((char *)(pass.SERVICE_1), 22);
+      file.write((char *)(pass.RESERVE_2), 2);
+      file.write((char *)(pass.DATA_TYPE), 2);
+
+      file.write((char *)(&(pass.STAGE_DATA)), sizeof(STAGE_DATA));
+      file.write((char *)(&(pass.CHANNEL_NUM)), sizeof(CHANNEL_NUM));
+      file.write((char *)(&(pass.SIGNIFICANT_PIXELS_MAX_VALUE)), sizeof(SIGNIFICANT_PIXELS_MAX_VALUE));
+      file.write((char *)(&(pass.PROECTION_TYPE)), sizeof(PROECTION_TYPE));
+      file.write((char *)(&(pass.STRINGS_COUNT)), sizeof(STRINGS_COUNT));
+      file.write((char *)(&(pass.COUNT_PIXELS)), sizeof(COUNT_PIXELS));
+      file.write((char *)(&(pass.LATITUDE)), sizeof(LATITUDE));
+      file.write((char *)(&(pass.LONGITUDE)), sizeof(LONGITUDE));
+      file.write((char *)(&(pass.SIZE_LATITUDE)), sizeof(SIZE_LATITUDE));
+      file.write((char *)(&(pass.SIZE_LONGITUDE)), sizeof(SIZE_LONGITUDE));
+      file.write((char *)(&(pass.STEP_LATITUDE)), sizeof(STEP_LATITUDE));
+      file.write((char *)(&(pass.STEP_LONGITUDE)), sizeof(STEP_LONGITUDE));
+      file.write((char *)(&(pass.COEFFICIENT_A)), sizeof(COEFFICIENT_A));
+      file.write((char *)(&(pass.COEFFICIENT_B)), sizeof(COEFFICIENT_B));
+      file.write((char *)(pass.RESERVE_3), 10);
+      file.write((char *)(&(pass.NODE_NUM)), sizeof(NODE_NUM));
+      file.write((char *)(&(pass.ELEMENTS_NUM)), sizeof(ELEMENTS_NUM));
+      file.write((char *)(&(pass.EFERMIDS_TYPE)), sizeof(EFERMIDS_TYPE));
+      file.write((char *)(&(pass.NODE_YEAR)), sizeof(NODE_YEAR));
+      file.write((char *)(&(pass.DAY_NUM)), sizeof(DAY_NUM));
+      file.write((char *)(&(pass.AVERAGE_MOV)), sizeof(AVERAGE_MOV));
+      file.write((char *)(&(pass.AIR_RESISTANCE)), sizeof(AIR_RESISTANCE));
+      file.write((char *)(&(pass.OBLIQUITY)), sizeof(OBLIQUITY));
+      file.write((char *)(&(pass.RIGHT_ASCENSION_ASCENDING_NODE)), sizeof(RIGHT_ASCENSION_ASCENDING_NODE));
+      file.write((char *)(&(pass.ECCENTRICITY)), sizeof(ECCENTRICITY));
+      file.write((char *)(&(pass.PERIGEE_ARGUMENT)), sizeof(PERIGEE_ARGUMENT));
+      file.write((char *)(&(pass.MEAN_ANOMALY)), sizeof(MEAN_ANOMALY));
+      file.write((char *)(pass.RESERVE_4), 54);
+      file.write((char *)(&(pass.CORRECTION_VERSION_NUM)), sizeof(CORRECTION_VERSION_NUM));
+      file.write((char *)(&(pass.MANDAREL_BOARD_CLOCK)), sizeof(MANDAREL_BOARD_CLOCK));
+      file.write((char *)(&(pass.CORRECTION_TIME)), sizeof(CORRECTION_TIME));
+      file.write((char *)(&(pass.ROLL)), sizeof(ROLL));
+      file.write((char *)(&(pass.PITCH)), sizeof(PITCH));
+      file.write((char *)(&(pass.YAW)), sizeof(YAW));
+      file.write((char *)(pass.RESERVE_5), 226);
+
+    return file;
   }
 private:
   uint32_t STAGE_DATA;                  // 64 -- Стадия обработки данных
@@ -256,7 +328,7 @@ private:
     file.read(reinterpret_cast<char *>(&(pass.PERIGEE_ARGUMENT)), sizeof(PERIGEE_ARGUMENT));
     file.read(reinterpret_cast<char *>(&(pass.MEAN_ANOMALY)), sizeof(MEAN_ANOMALY));
     file.read(reinterpret_cast<char *>(pass.RESERVE_4), 54);
-    file.read(reinterpret_cast<char *>(&(pass.CORRECTION_VERSION_NUM)), sizeof(CORRECTION_TIME));
+    file.read(reinterpret_cast<char *>(&(pass.CORRECTION_VERSION_NUM)), sizeof(CORRECTION_VERSION_NUM));
     file.read(reinterpret_cast<char *>(&(pass.MANDAREL_BOARD_CLOCK)), sizeof(MANDAREL_BOARD_CLOCK));
     file.read(reinterpret_cast<char *>(&(pass.CORRECTION_TIME)), sizeof(CORRECTION_TIME));
     file.read(reinterpret_cast<char *>(&(pass.ROLL)), sizeof(ROLL));
