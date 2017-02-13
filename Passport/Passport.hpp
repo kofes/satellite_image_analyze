@@ -163,6 +163,19 @@ public:
   inline const unsigned short getChannelNum () {
     return CHANNEL_NUM;
   }
+  inline const std::string getProectionType () {
+    if (PROECTION_TYPE == 1)
+      return "меркаторская";
+    if (PROECTION_TYPE == 2)
+      return "равнопромежуточная";
+    return "ошибка";
+  }
+  inline const float getLatitude () {
+    return LATITUDE;
+  }
+  inline const float getLongitude () {
+    return LONGITUDE;
+  }
 private:
   uint32_t STAGE_DATA;                  // 64 -- Стадия обработки данных
   uint16_t CHANNEL_NUM;                 // 68 -- Номер канала (возможные значения: 1, 2, 3, 4, 5)
