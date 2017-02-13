@@ -12,6 +12,7 @@ class Image {
 public:
   Image () : iWidth(0), iHeight(0), pImage(nullptr) {};
   Image ( short width, short height, const std::string& fileName );
+  Image ( const satellite::Image& img );
   void read ( short width, short height, std::ifstream& file );
   ~Image ();
   const unsigned short width () const {
@@ -23,8 +24,19 @@ public:
   inline const unsigned short* operator[] ( unsigned short index ) const {
     return pImage[index];
   };
-  void display ( unsigned short width, unsigned short height, unsigned short x0, unsigned short y0, unsigned short dx, unsigned short dy );
+  void display ( unsigned short width, unsigned short height, unsigned short x0, unsigned short y0, unsigned short dx, unsigned short dy, unsigned short minColor, unsigned short maxColor );
+  void ChangeMaxMin ( unsigned short minColor, unsigned short maxColor );
 private:
+  /*Вывод изображения в файл в бинарном виде*/
+  friend std::ofstream& operator< ( std::ofstream& file, const satellite::Image& img ) {
+    if ( img.pImage == nullptr || !img.iWidth || !img.iHeight )
+      return file;
+
+    for (unsigned short i = 0; i < img.iHeight; ++i)
+        file.write((char*)(img.pImage[i]), sizeof(short)*img.iWidth);
+
+    return file;
+  }
   unsigned short iWidth, iHeight;
   unsigned short** pImage;
 };
