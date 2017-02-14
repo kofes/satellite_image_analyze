@@ -333,7 +333,7 @@ double satellite::math::var ( short x0, short y0, short x1, short y1, double h, 
       }
     }
 
-  result /= count;
+  result /= 2 * count;
 
   return result;
 };
