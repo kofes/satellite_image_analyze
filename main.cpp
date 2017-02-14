@@ -4,13 +4,13 @@
 #include <iostream>
 #include <fstream>
 #include <SDL2/SDL.h>
-#include <queue>
+#include <iomanip>
 
 using namespace satellite;
 
 int main () {
   std::ifstream file("../2016-01-01.NOAA_19.pro", std::ios::binary );
-  std::ofstream out( "out.pro", std::ios::binary );
+  std::ofstream out( "out.txt" );
   passport::Proection pass;
   Image img;
   file >> pass;
@@ -22,12 +22,22 @@ int main () {
             << "Номер канала: " << pass.getChannelNum() << std::endl;
 
   img.read(pass.getCountPixelsInLine(), pass.getCountLines(), file);
-  img.ChangeMaxMin(0, 300);
 
+  double d, h = 0.8;
+  short start = 350, end = 500;
+  std::streamsize ss = std::cout.precision();
 
-  out < pass < img;
-
-  // img.display(420, 620, 0, 0, pass.getCountPixelsInLine(), pass.getCountLines(), 0, 1000 );
+  while (h <= (end - start)) {
+    d = math::d(start, start, end, end, h, img);
+    if (std::abs(d) >= 1) break;
+    out << std::fixed << std::setprecision(1)
+        << "h: " << h
+        << std::defaultfloat << std::setprecision(ss)
+        << "\t|var: " <<  math::var(start, start, end, end, h, img)
+        << "\t|cov: " << math::cov(start, start, end, end, h, img)
+        << std::endl;
+    h+= 0.2;
+  }
 
   out.close();
   file.close();
