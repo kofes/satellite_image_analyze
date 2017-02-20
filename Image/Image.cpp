@@ -109,95 +109,126 @@ void satellite::Image::read ( short width, short height, std::ifstream& file ) {
 }
 
 void satellite::Image::display ( unsigned short width, unsigned short height, unsigned short x0, unsigned short y0, unsigned short dx, unsigned short dy, unsigned short minColor, unsigned short maxColor ) {
-  SDL_DisplayMode displayMode;
-  SDL_Event event;
-  SDL_Renderer *renderer;
-  SDL_Window* window;
-  short coefficient;
+  sf::RenderWindow window;
+  sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
+  sf::Image imgBuffer;
+  sf::Texture imgTexture;
+  sf::Sprite imgSprite;
+  sf::View view;
+  float coefficient;
 
   if ( pImage == nullptr || !dx || !dy) return;
+  if (y0 + dy > iHeight) dy = iHeight - y0;
+  if (x0 + dx > iWidth) dx = iWidth - x0;
+
+  if (!height || height > desktopMode.height) height = desktopMode.height;
+  if (!width || width > desktopMode.width) width = desktopMode.width;
 
   coefficient = std::max(dy/(double)height, dx/(double)width);
-  if (coefficient < 1 + 1e-5)
-    coefficient = 1;
+  if (coefficient < 1) coefficient = 1;
 
-  if (SDL_Init(SDL_INIT_VIDEO)) {
-    std::cerr << "SDL_Init error: " << SDL_GetError() << std::endl;
-    return;
+  std::cout << "coef: " << coefficient << std::endl;
+
+  window.create(sf::VideoMode(width, height), "Image");
+  window.setVerticalSyncEnabled(false);
+
+  imgBuffer.create(dx, dy, sf::Color::Black);
+  imgTexture.create(dx, dy);
+
+  if (minColor >= maxColor)
+    minColor = maxColor - 1 > 0 ? maxColor - 1 : 0;
+
+  if (!maxColor)
+    for (int i = 0; i < dy; ++i)
+      for (int j = 0; j < dx; ++j)
+        if (maxColor < pImage[i][j])
+          maxColor = pImage[i][j];
+
+  for (int i = 0; i < dy; ++i)
+    for (int j = 0; j < dx; ++j) {
+    unsigned short color;
+    color = pImage[y0 + (dy - i - 1)][x0 + j];
+
+    if (color < minColor) color = minColor;
+    if (color > maxColor) color = maxColor;
+
+    color = color / ((double)maxColor) * 255;
+    imgBuffer.setPixel(j, i, sf::Color(color, color, color));
   }
 
-  SDL_GetCurrentDisplayMode(0, &displayMode);
+  imgTexture.update(imgBuffer);
+  imgSprite.setTexture(imgTexture);
+  view.reset(sf::FloatRect(0, 0, width, height));
+  char zoom = 0, maxZoom = 20, minZoom = -5;
+  imgSprite.setOrigin(imgTexture.getSize().x/2, imgTexture.getSize().y/2);
+  imgSprite.setScale(1/coefficient, 1/coefficient);
+  imgSprite.setPosition(width/2, height/2);
 
-  if (!height)
-    height = displayMode.h;
+  while (window.isOpen()) {
+    sf::Event event;
 
-  if (!width)
-    width = displayMode.w;
-
-  window = SDL_CreateWindow("picture", 0, 0, width, height, SDL_WINDOW_SHOWN);
-  if (window == nullptr) {
-    std::cerr << "SDL_CreateWindow error: " << SDL_GetError() << std::endl;
-    SDL_Quit();
-    return;
-  }
-
-  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
-  if (renderer == nullptr) {
-    std::cerr << "SDL_CreateRenderer error: " << SDL_GetError() << std::endl;
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-    return;
-  }
-
-  SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
-  SDL_RenderClear(renderer);
-
-  if (!maxColor) {
-    for (int i = 0; i < height; ++i)
-      for (int j = 0; j < width; ++j) {
-        int color;
-        color = 0;
-        if (coefficient*i + coefficient < dy && coefficient*j + coefficient < dx) {
-          for (char k = 0; k < coefficient; ++k)
-          for (char l = 0; l < coefficient; ++l)
-            color += pImage[y0 + coefficient*i + k][x0 + coefficient*j + l];
-          color /= coefficient*coefficient;
-        }
-        if (maxColor < color)
-          maxColor = color;
+    while (window.pollEvent(event)) {
+      sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+      switch (event.type) {
+        case (sf::Event::Closed) :
+          window.close();
+        break;
+        case (sf::Event::Resized) :
+          view.setSize(event.size.width,event.size.height);
+          view.setCenter(event.size.width/2,event.size.height/2);
+          imgSprite.setPosition(event.size.width/2,event.size.height/2);
+        break;
+        case (sf::Event::KeyPressed) :
+          switch (event.key.code) {
+            case (sf::Keyboard::Add) :
+              if (zoom < maxZoom) {
+                ++zoom;
+                imgSprite.setScale((1 + zoom*0.1)/coefficient, (1 + zoom*0.1)/coefficient);
+              }
+            break;
+            case (sf::Keyboard::Subtract) :
+              if (zoom > minZoom) {
+                --zoom;
+                imgSprite.setScale((1 + zoom*0.1)/coefficient, (1 + zoom*0.1)/coefficient);
+              }
+            break;
+            case (sf::Keyboard::Left) :
+              if (view.getSize().x < imgSprite.getGlobalBounds().width)
+                view.move(-20, 0);
+              std::cout << "View width: " << view.getSize().x << ", View height: " << view.getSize().y << ", View center: " << view.getCenter().x << ":" << view.getCenter().y << std::endl;
+            break;
+            case (sf::Keyboard::Right) :
+              if (view.getSize().x < imgSprite.getGlobalBounds().width)
+                view.move(20, 0);
+              std::cout << "View width: " << view.getSize().x << ", View height: " << view.getSize().y << ", View center: " << view.getCenter().x << ":" << view.getCenter().y << std::endl;
+            break;
+            case (sf::Keyboard::Up) :
+              if (view.getSize().y < imgSprite.getGlobalBounds().height)
+                view.move(0, -20);
+              std::cout << "View width: " << view.getSize().x << ", View height: " << view.getSize().y << ", View center: " << view.getCenter().x << ":" << view.getCenter().y << std::endl;
+            break;
+            case (sf::Keyboard::Down) :
+              if (view.getSize().y < imgSprite.getGlobalBounds().height)
+                view.move(0, 20);
+              std::cout << "View width: " << view.getSize().x << ", View height: " << view.getSize().y << ", View center: " << view.getCenter().x << ":" << view.getCenter().y << std::endl;
+            break;
+            case (sf::Keyboard::P) :
+              std::cout << mousePosition.x - imgSprite.getGlobalBounds().left << ":" << mousePosition.y - imgSprite.getGlobalBounds().top/imgSprite.getScale().y << std::endl;
+            break;
+            case (sf::Keyboard::F) :
+              view.setCenter(event.size.width/2,event.size.height/2);
+              imgSprite.setPosition(event.size.width/2,event.size.height/2);
+            break;
+          }
+        break;
       }
+    }
+
+    window.setView(view);
+    window.clear(sf::Color::Black);
+    window.draw(imgSprite);
+    window.display();
   }
-
-  while (true) {
-    if (SDL_PollEvent(&event) && event.type == SDL_QUIT)
-      break;
-
-    for (int i = 0; i < height; ++i)
-      for (int j = 0; j < width; ++j) {
-        int color;
-        color = 0;
-        if (coefficient*i + coefficient < dy && coefficient*j + coefficient < dx) {
-          for (char k = 0; k < coefficient; ++k)
-          for (char l = 0; l < coefficient; ++l)
-            color += pImage[y0 + coefficient*i + k][x0 + coefficient*j + l];
-          color /= coefficient*coefficient;
-        }
-        if (color < minColor)
-          color = minColor;
-        if (color > maxColor)
-          color = maxColor;
-        if (color < 0)
-          color = 0;
-        color = color / ((double)maxColor) * 255;
-        SDL_SetRenderDrawColor(renderer, color, color, color, 0xFF);
-        SDL_RenderDrawPoint(renderer, j, height - i);
-      }
-    SDL_RenderPresent(renderer);
-  }
-
-  SDL_DestroyRenderer(renderer);
-  SDL_DestroyWindow(window);
-  SDL_Quit();
 };
 
 void satellite::Image::ChangeMaxMin ( unsigned short minColor, unsigned short maxColor ) {
