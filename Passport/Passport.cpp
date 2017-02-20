@@ -203,7 +203,7 @@ satellite::passport::Proection::Proection ( const satellite::passport::Proection
     RESERVE_5[i] = src.RESERVE_5[i];
 }
 
-const std::string satellite::passport::Proection::getStageData () {
+const std::string satellite::passport::Proection::getStageData () const {
   std::string result = "колибровка: ";
 
   if (STAGE_DATA & 0x01)

@@ -170,28 +170,40 @@ public:
   Proection ( const std::string& fileName );
   Proection ( const passport::Default& src ) : Default(src) {};
   Proection ( const passport::Proection& src );
-  const std::string getStageData ();
-  inline const unsigned short getCountPixelsInLine () {
+  const std::string getStageData () const;
+  inline unsigned short getCountPixelsInLine () const {
     return COUNT_PIXELS;
   }
-  inline const unsigned short getCountLines () {
+  inline unsigned short getCountLines () const {
     return STRINGS_COUNT;
   }
-  inline const unsigned short getChannelNum () {
+  inline unsigned short getChannelNum () const {
     return CHANNEL_NUM;
   }
-  inline const std::string getProectionType () {
+  inline const std::string getProectionType () const {
     if (PROECTION_TYPE == 1)
       return "меркаторская";
     if (PROECTION_TYPE == 2)
       return "равнопромежуточная";
     return "ошибка";
   }
-  inline const float getLatitude () {
+  inline float getLatitude () const {
     return LATITUDE;
   }
-  inline const float getLongitude () {
+  inline float getLongitude () const {
     return LONGITUDE;
+  }
+  inline float getLatitudeSize () const {
+    return SIZE_LATITUDE;
+  }
+  inline float getLongitudeSize () const {
+    return SIZE_LONGITUDE;
+  }
+  inline float getLatitudeStep () const {
+    return STEP_LATITUDE;
+  }
+  inline float getLongitudeStep () const {
+    return STEP_LONGITUDE;
   }
   /*Вывод пасспорта проекции в файл в бинарном виде*/
   friend std::ofstream& operator< ( std::ofstream& file, const satellite::passport::Proection& pass ) {
