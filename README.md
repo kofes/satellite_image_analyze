@@ -6,4 +6,4 @@ ProectionPassport: add new getters;
 
 Image: fix bugs;
 
-Math : check functions;
+Math: check functions;
