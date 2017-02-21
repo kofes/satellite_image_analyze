@@ -7,10 +7,50 @@
 
 namespace satellite {
 
+//Bresenham's line algorithm
+std::queue< std::pair<short, short> > getPixelsInLine ( short x0, short y0, short x1, short y1 );
+
 //Bresenham's line algorithm (circle)
-std::queue< std::pair<short, short> > getPixels ( short x0, short y0, short x1, short y1 );
+std::queue< std::pair<short, short> > getPixelsInCircle ( short x0, short y0, short r );
 
 namespace math {
+
+/*
+ * Package of variables such as dreif, covariance, correlation, semivariance
+ *-----------------------
+ * err:
+ *  - false - no errors
+ *  - true - bad data
+**/
+class Pack {
+public:
+  Pack ( double d = 0, double cov = 0, double cor = 0, double s = 0 ) : dreif(d), covariance(cov), correlation(cor), semivariance(s) {};
+  Pack calc (  short x0, short y0, short x1, short y1, double h, satellite::Image& picture  );
+  inline bool checkErr () {
+    return err;
+  };
+  inline void resetErr () {
+    err = false;
+  }
+  inline double getDreif () {
+    return dreif;
+  };
+  inline double getCovariance () {
+    return covariance;
+  };
+  inline double getCorrelation () {
+    return correlation;
+  };
+  inline double getSemivariance () {
+    return semivariance;
+  };
+private:
+  double dreif,
+         covariance,
+         correlation,
+         semivariance;
+  bool err;
+};
 
 //First moment of matix
 double m ( short x0, short y0, short x1, short y1, satellite::Image& picture);
@@ -37,7 +77,7 @@ double cov ( short x0, short y0, short x1, short y1, double h, satellite::Image&
 double r ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture );
 
 //Semivariance of matrix with log h
-double var ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture );
+double g ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture );
 
 };
 };
