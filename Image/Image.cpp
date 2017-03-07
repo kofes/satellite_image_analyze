@@ -116,6 +116,7 @@ void satellite::Image::display ( unsigned short width, unsigned short height, un
   sf::Sprite imgSprite;
   sf::View view;
   float coefficient;
+  unsigned short MAX_COLOR;
 
   if ( pImage == nullptr || !dx || !dy) return;
   if (y0 + dy > iHeight) dy = iHeight - y0;
@@ -138,23 +139,26 @@ void satellite::Image::display ( unsigned short width, unsigned short height, un
   if (minColor >= maxColor)
     minColor = maxColor - 1 > 0 ? maxColor - 1 : 0;
 
+  for (int i = 0; i < dy; ++i)
+    for (int j = 0; j < dx; ++j)
+      if (MAX_COLOR < pImage[i][j])
+        MAX_COLOR = pImage[i][j];
   if (!maxColor)
-    for (int i = 0; i < dy; ++i)
-      for (int j = 0; j < dx; ++j)
-        if (maxColor < pImage[i][j])
-          maxColor = pImage[i][j];
+    maxColor = MAX_COLOR;
+
 
   for (int i = 0; i < dy; ++i)
     for (int j = 0; j < dx; ++j) {
-    unsigned short color;
-    color = pImage[y0 + (dy - i - 1)][x0 + j];
+      unsigned short color;
+      color = pImage[y0 + (dy - i - 1)][x0 + j];
 
-    if (color < minColor) color = minColor;
-    if (color > maxColor) color = maxColor;
+      if (color < minColor) color = minColor;
+      if (color > maxColor) color = maxColor;
 
-    color = color / ((double)maxColor) * 255;
-    imgBuffer.setPixel(j, i, sf::Color(color, color, color));
-  }
+      color = color / ((double)maxColor) * 255;
+      imgBuffer.setPixel(j, i, sf::Color(color, color, color));
+    }
+
 
   imgTexture.update(imgBuffer);
   imgSprite.setTexture(imgTexture);
@@ -197,6 +201,26 @@ void satellite::Image::display ( unsigned short width, unsigned short height, un
                 view.move(-20, 0);
               std::cout << "View width: " << view.getSize().x << ", View height: " << view.getSize().y << ", View center: " << view.getCenter().x << ":" << view.getCenter().y << std::endl;
             break;
+            case (sf::Keyboard::Numpad9) :
+              maxColor += 2;
+              if (maxColor > MAX_COLOR)
+                maxColor = MAX_COLOR;
+            break;
+            case (sf::Keyboard::Numpad3) :
+              maxColor -= 2;
+              if (maxColor < minColor || !maxColor || !(maxColor + 1))
+                maxColor = minColor;
+            break;
+            case (sf::Keyboard::Numpad7) :
+              minColor += 2;
+              if (minColor > maxColor)
+                minColor = maxColor;
+            break;
+            case (sf::Keyboard::Numpad1) :
+              minColor -= 2;
+              if (minColor > maxColor)
+                minColor = 0;
+            break;
             case (sf::Keyboard::Right) :
               if (view.getSize().x < imgSprite.getGlobalBounds().width)
                 view.move(20, 0);
@@ -224,6 +248,22 @@ void satellite::Image::display ( unsigned short width, unsigned short height, un
       }
     }
 
+    for (int i = 0; i < dy; ++i)
+      for (int j = 0; j < dx; ++j) {
+        unsigned short color;
+        color = pImage[y0 + (dy - i - 1)][x0 + j];
+
+        if (color < minColor) color = minColor;
+        if (color > maxColor) color = maxColor;
+
+        color = color / ((double)maxColor) * 255;
+        imgBuffer.setPixel(j, i, sf::Color(color, color, color));
+      }
+
+
+    imgTexture.update(imgBuffer);
+    imgSprite.setTexture(imgTexture);
+
     window.setView(view);
     window.clear(sf::Color::Black);
     window.draw(imgSprite);
@@ -231,7 +271,7 @@ void satellite::Image::display ( unsigned short width, unsigned short height, un
   }
 };
 
-void satellite::Image::ChangeMaxMin ( unsigned short minColor, unsigned short maxColor ) {
+void satellite::Image::changeMaxMin ( unsigned short minColor, unsigned short maxColor ) {
   if ( pImage == nullptr || !iWidth || !iHeight )
     return;
 
@@ -242,4 +282,50 @@ void satellite::Image::ChangeMaxMin ( unsigned short minColor, unsigned short ma
       if ( pImage[i][j] < minColor )
         pImage[i][j] = minColor;
     }
+};
+
+void satellite::Image::binary ( unsigned short border ) {
+  if ( pImage == nullptr || !iWidth || !iHeight )
+    return;
+
+  for (int i = 0; i < iHeight; ++i)
+    for (int j = 0; j < iWidth; ++j) {
+      if ( pImage[i][j] >= border )
+        pImage[i][j] = 255;
+      else
+        pImage[i][j] = 0;
+    }
+}
+
+void copy ( unsigned short width, unsigned short height, unsigned short** src )  {
+  if ( !width || !height || src == nullptr || *src == nullptr )
+    return;
+
+  for (unsigned short i = 0; i < iHeight; ++i)
+    delete[] pImage[i];
+  delete[] pImage;
+
+  iWidth = width;
+  iHeight = height;
+
+  pImage = new unsigned short*[iHeight];
+  if (pImage == nullptr) {
+    iWidth = iHeight = 0;
+    return;
+  }
+  for (int i = 0; i < iHeight; ++i) {
+    pImage[i] = new unsigned short[iWidth];
+    if (pImage[i] == nullptr) {
+      i--;
+      while (i-- > 0)
+        delete[] pImage[i];
+      delete[] pImage;
+      iWidth = iHeight = 0;
+      return;
+    }
+  }
+
+  for (int i = 0; i < iHeight; ++i)
+    for (int j = 0; j < iWidth; ++j)
+      pImage[i][j] = src[i][j];
 };

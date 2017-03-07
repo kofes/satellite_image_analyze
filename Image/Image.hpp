@@ -26,14 +26,9 @@ public:
     return pImage[index];
   };
   void display ( unsigned short width, unsigned short height, unsigned short x0, unsigned short y0, unsigned short dx, unsigned short dy, unsigned short minColor = 0, unsigned short maxColor = 300 );
-  void ChangeMaxMin ( unsigned short minColor, unsigned short maxColor );
-  //FOR TEST!
-  void copy (unsigned short width, unsigned short height, unsigned short** src) {
-    iWidth = width;
-    iHeight = height;
-    pImage = src;
-  }
-  //
+  void changeMaxMin ( unsigned short minColor, unsigned short maxColor );
+  void binary ( unsigned short border );
+  void copy (unsigned short width, unsigned short height, unsigned short** src);
 private:
   /*Вывод изображения в файл в бинарном виде*/
   friend std::ofstream& operator< ( std::ofstream& file, const satellite::Image& img ) {
