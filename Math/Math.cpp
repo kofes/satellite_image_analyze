@@ -9,7 +9,7 @@ std::queue< std::pair<short, short> > satellite::getPixelsInLine ( short x0, sho
   std::queue< std::pair<short, short> > result;
 
   while ( x0 != x1 || y0 != y1 ) {
-    result.push(std::pair<short, short>(x0, y0));
+    result.push(std::make_pair(x0, y0));
 
     short err2 = err*2;
     if (err2 > -dy) {
@@ -33,10 +33,10 @@ std::queue< std::pair<short, short> > satellite::getPixelsInCircle ( short x0, s
   int err = 0;
   std::queue< std::pair<short, short> > result;
   while (y >= 0) {
-    result.push(std::pair<short, short>(x0 + x, y0 + y));
-    result.push(std::pair<short, short>(x0 + x, y0 - y));
-    result.push(std::pair<short, short>(x0 - x, y0 + y));
-    result.push(std::pair<short, short>(x0 - x, y0 - y));
+    result.push(std::make_pair(x0 + x, y0 + y));
+    result.push(std::make_pair(x0 + x, y0 - y));
+    result.push(std::make_pair(x0 - x, y0 + y));
+    result.push(std::make_pair(x0 - x, y0 - y));
       err = 2 * (delta + y) - 1;
       if ((delta < 0) && (err <= 0)) {
           delta += 2 * ++x + 1;
@@ -77,7 +77,7 @@ satellite::math::Pack satellite::math::Pack::calc (  short x0, short y0, short x
       while (y >= 0) {
         if (j + y < y1 && i + x < x1) {
           ++count;
-          dreif += (picture[j][i] - picture[j + y][i + x]);
+          dreif += picture[j + y][i + x] - picture[j][i];
           covariance += picture[j][i] * picture[j + y][i + x];
           semivariance += (picture[j][i] - picture[j + y][i + x])*(picture[j][i] - picture[j + y][i + x]);
           m_0 += picture[j][i];
@@ -106,39 +106,6 @@ satellite::math::Pack satellite::math::Pack::calc (  short x0, short y0, short x
     dreif /= count;
     covariance /= count;
     covariance -= m_0 * m_h;
-  }
-  //Calculation of correlation
-  if (count) {
-    for (int j = y0; j < y1; ++j)
-      for (int i = x0; i < x1; ++i) {
-        int x = 0;
-        int y = h;
-        int delta = 1 - 2*h;
-        int err = 0;
-        while (y >= 0) {
-          if (j + y < y1 && i + x < x1) {
-            s_0 += (picture[j][i] - m_0)*(picture[j][i] - m_0);
-            s_h += (picture[j+y][i+x] - m_h)*(picture[j+y][i+x] - m_h);
-          }
-          err = 2 * (delta + y) - 1;
-          if ((delta < 0) && (err <= 0)) {
-            delta += 2* ++x + 1;
-            continue;
-          }
-          err = 2 * (delta - x) - 1;
-          if ((delta > 0) && (err > 0)) {
-            delta += 1 - 2* --y;
-            continue;
-          }
-          x++;
-          delta +=2*(x-y);
-          y--;
-        }
-      }
-    s_0 /= count;
-    s_h /= count;
-    double dv = std::sqrt(s_0 * s_h);
-    correlation = covariance / dv;
   }
 
   return *this;
@@ -350,7 +317,7 @@ double satellite::math::d ( short x0, short y0, short x1, short y1, double h, sa
       while (y >= 0) {
         if (j + y < y1 && i + x < x1) {
           ++count;
-          result += (picture[j][i] - picture[j + y][i + x]);
+          result += picture[j + y][i + x] - picture[j][i];
         }
         err = 2 * (delta + y) - 1;
         if ((delta < 0) && (err <= 0)) {

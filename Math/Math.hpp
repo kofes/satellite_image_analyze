@@ -24,7 +24,7 @@ namespace math {
 **/
 class Pack {
 public:
-  Pack ( double d = 0, double cov = 0, double cor = 0, double s = 0 ) : dreif(d), covariance(cov), correlation(cor), semivariance(s) {};
+  Pack ( double d = 0, double cov = 0, double s = 0 ) : dreif(d), covariance(cov), semivariance(s) {};
   Pack calc (  short x0, short y0, short x1, short y1, double h, satellite::Image& picture  );
   inline bool checkErr () {
     return err;
@@ -38,16 +38,12 @@ public:
   inline double getCovariance () {
     return covariance;
   };
-  inline double getCorrelation () {
-    return correlation;
-  };
   inline double getSemivariance () {
     return semivariance;
   };
 private:
   double dreif,
          covariance,
-         correlation,
          semivariance;
   bool err;
 };
