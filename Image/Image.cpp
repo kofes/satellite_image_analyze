@@ -297,7 +297,7 @@ void satellite::Image::binary ( unsigned short border ) {
     }
 }
 
-void copy ( unsigned short width, unsigned short height, unsigned short** src )  {
+void satellite::Image::copy ( unsigned short width, unsigned short height, unsigned short** src )  {
   if ( !width || !height || src == nullptr || *src == nullptr )
     return;
 
