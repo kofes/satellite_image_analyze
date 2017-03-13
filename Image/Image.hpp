@@ -30,7 +30,7 @@ public:
   void binary ( unsigned short border );
   void copy (unsigned short width, unsigned short height, unsigned short** src);
 private:
-  /*Вывод изображения в файл в бинарном виде*/
+  /*Write image in binary into stream*/
   friend std::ofstream& operator< ( std::ofstream& file, const satellite::Image& img ) {
     if ( img.pImage == nullptr || !img.iWidth || !img.iHeight )
       return file;
