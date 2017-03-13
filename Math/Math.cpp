@@ -59,10 +59,10 @@ satellite::math::Pack satellite::math::Pack::calc (  short x0, short y0, short x
   double m_h, m_0, s_0, s_h;
   m_h = m_0 = s_0 = s_h = 0;
   unsigned int count = 0;
-  err = false;
+  _err = false;
 
   if (x0 < 0 || x1 > picture.width() || y0 < 0 || y1 > picture.height() || x1 < 0 || y1 < 0) {
-    err = true;
+    _err = true;
     return *this;
   }
   if (h <= 1e-5 || !(x1 - x0) || !(y1 - y0))
@@ -77,9 +77,9 @@ satellite::math::Pack satellite::math::Pack::calc (  short x0, short y0, short x
       while (y >= 0) {
         if (j + y < y1 && i + x < x1) {
           ++count;
-          dreif += picture[j + y][i + x] - picture[j][i];
-          covariance += picture[j][i] * picture[j + y][i + x];
-          semivariance += (picture[j][i] - picture[j + y][i + x])*(picture[j][i] - picture[j + y][i + x]);
+          _drift += picture[j + y][i + x] - picture[j][i];
+          _covariance += picture[j][i] * picture[j + y][i + x];
+          _semivariance += (picture[j][i] - picture[j + y][i + x])*(picture[j][i] - picture[j + y][i + x]);
           m_0 += picture[j][i];
           m_h += picture[j + y][i + x];
         }
@@ -102,10 +102,10 @@ satellite::math::Pack satellite::math::Pack::calc (  short x0, short y0, short x
   if (count) {
     m_0 /= count;
     m_h /= count;
-    semivariance /= 2 * count;
-    dreif /= count;
-    covariance /= count;
-    covariance -= m_0 * m_h;
+    _semivariance /= 2 * count;
+    _drift /= count;
+    _covariance /= count;
+    _covariance -= m_0 * m_h;
   }
 
   return *this;
@@ -430,4 +430,61 @@ double satellite::math::g ( short x0, short y0, short x1, short y1, double h, sa
   if (count) result /= 2 * count;
 
   return result;
+};
+
+std::vector<double> satellite::math::leastSquares ( unsigned long int degree, std::list<double> x, std::list<double> y, double maxDiff ) {
+  if (!x.size() || !y.size() || x.size() != y.size() || maxDiff <= 0)
+    return std::vector<double>();
+
+  //mat*ans = res
+
+  std::vector<double> ans, res, tmp;
+  std::vector< std::vector<double> > mat;
+  ans.resize(degree + 1);
+  res.resize(degree + 1);
+  tmp.resize(degree + 1);
+  mat.resize(degree + 1);
+  for (unsigned int i = 0; i <= degree; ++i)
+    mat[i].resize(degree + 1);
+
+  //fill left and bottom of matrics 'mat' and fill vector 'res'
+  for (unsigned int i = 0; i <= degree; ++i) {
+    std::list<double>::iterator it_x, it_y;
+    for (it_x = x.begin(), it_y = y.begin(); it_x != x.end() && it_y != y.end(); ++it_x, ++it_y)
+      if (std::abs(*it_x) > 1e-5 || !(degree-i)) {
+        double tmp_x = std::pow(*it_x, degree-i) / x.size();
+        //set res
+        res[i] += tmp_x * (*it_y);
+        //set left and bottom
+        mat[degree][i] += tmp_x;
+        mat[i][0] += std::pow(*it_x, 2*degree - i) / x.size();
+      }
+  }
+  mat[degree][0] /= 2;
+  mat[degree][degree] = 1;
+
+  //fill all
+  for (unsigned int j = 1; j <= degree; ++j)
+    for (unsigned int i = 0; i < degree; ++i)
+      mat[i][j] = mat[i+1][j-1];
+
+  //find 'ans'
+  double err = 1;
+  while (err > maxDiff) {
+    tmp = ans;
+    err = 0;
+    for (unsigned int i = 0; i <= degree; ++i) {
+      double a1, a2;
+      a1 = a2 = 0;
+      for (unsigned int j = 0; j < i; ++j)
+        a1 += mat[i][j]*ans[j];
+      for (unsigned int j = i+1; j <= degree; ++j)
+        a2 += mat[i][j]*tmp[j];
+      ans[i] = (res[i] - a1 - a2) / mat[i][i];
+      if (std::abs(ans[i] - tmp[i]) > err)
+        err = std::abs(ans[i] - tmp[i]);
+    }
+  }
+
+  return ans;
 };

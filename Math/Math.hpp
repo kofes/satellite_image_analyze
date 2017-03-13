@@ -3,6 +3,8 @@
 #include <cmath>
 #include <queue>
 #include <utility>
+#include <list>
+#include <vector>
 #include "../Image/Image.hpp"
 
 namespace satellite {
@@ -14,7 +16,6 @@ std::queue< std::pair<short, short> > getPixelsInLine ( short x0, short y0, shor
 std::queue< std::pair<short, short> > getPixelsInCircle ( short x0, short y0, short r );
 
 namespace math {
-
 /*
  * Package of variables such as dreif, covariance, correlation, semivariance
  *-----------------------
@@ -24,28 +25,28 @@ namespace math {
 **/
 class Pack {
 public:
-  Pack ( double d = 0, double cov = 0, double s = 0 ) : dreif(d), covariance(cov), semivariance(s) {};
-  Pack calc (  short x0, short y0, short x1, short y1, double h, satellite::Image& picture  );
-  inline bool checkErr () {
-    return err;
+  Pack ( double d = 0, double cov = 0, double s = 0 ) : _drift(d), _covariance(cov), _semivariance(s) {};
+  Pack calc ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture  );
+  inline bool err () {
+    return _err;
   };
   inline void resetErr () {
-    err = false;
+    _err = false;
   }
-  inline double getDreif () {
-    return dreif;
+  inline double drift () {
+    return _drift;
   };
-  inline double getCovariance () {
-    return covariance;
+  inline double covariance () {
+    return _covariance;
   };
-  inline double getSemivariance () {
-    return semivariance;
+  inline double semivariance () {
+    return _semivariance;
   };
 private:
-  double dreif,
-         covariance,
-         semivariance;
-  bool err;
+  double _drift,
+         _covariance,
+         _semivariance;
+  bool _err;
 };
 
 //First moment of matix
@@ -63,7 +64,7 @@ double s0 ( short x0, short y0, short x1, short y1, double h, satellite::Image& 
 //Corresponding standard deviation +h of matrix with log h
 double sh ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture );
 
-//Dreif of matrix with log h
+//Drift of matrix with log h
 double d ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture );
 
 //Covariation of matrix with log h
@@ -74,6 +75,9 @@ double r ( short x0, short y0, short x1, short y1, double h, satellite::Image& p
 
 //Semivariance of matrix with log h
 double g ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture );
+
+//Get approximated function by Gauss–Seidel method
+std::vector<double> leastSquares ( unsigned long int degree, std::list<double> x, std::list<double> y, double maxDiff = 1e-2 );
 
 };
 };
