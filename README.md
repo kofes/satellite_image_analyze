@@ -84,7 +84,7 @@ Returns: ``unsigned short``
 
 Get height of *Image*
 
-##### operator[] ( Index )
+##### operator\[\] ( Index )
 
 Returns: ``const unsigned short*``
 
