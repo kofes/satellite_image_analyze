@@ -56,6 +56,24 @@ Returns: ``std::vector<double>``
 
 Computes the coefficients of the polynomial function with a degree of *Degree* using the least squares method (for solving the resulting system of linear algebraic equations used Gauss-Seidel method with the error *Diff*)
 
+##### a ( X, {Degree = 1} )
+
+Returns: ``double``
+
+Computes the "row moment" function of the vector *X*
+
+##### m ( X, {Degree = 2} )
+
+Returns: ``double``
+
+Computes the "central moment" function of the vector *X*
+
+##### cov ( X, Y )
+
+Returns: ``double``
+
+Computes the "covariance" function of the vector *X* and vector *Y*
+
 #### Class Pack
 
 Class **Pack** is class-container, that contain the values of "drift", "covariance" and "semivariance" and method ``calc``:

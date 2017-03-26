@@ -469,22 +469,101 @@ std::vector<double> satellite::math::leastSquares ( unsigned long int degree, st
       mat[i][j] = mat[i+1][j-1];
 
   //find 'ans'
-  double err = 1;
-  while (err > maxDiff) {
+  double diff = 1;
+  while (diff > maxDiff) {
     tmp = ans;
-    err = 0;
+    diff = 0;
     for (unsigned int i = 0; i <= degree; ++i) {
-      double a1, a2;
-      a1 = a2 = 0;
-      for (unsigned int j = 0; j < i; ++j)
-        a1 += mat[i][j]*ans[j];
-      for (unsigned int j = i+1; j <= degree; ++j)
-        a2 += mat[i][j]*tmp[j];
+      double a1, a2, err;
+      a1 = a2 = err = 0;
+      for (unsigned int j = 0; j < i; ++j) {
+        double buff, dt;
+        dt = mat[i][j]*ans[j] - err;
+        buff = a1 + dt;
+        err = (buff - a1) - dt;
+        a1 = buff;
+      }
+      err = 0;
+      for (unsigned int j = i+1; j <= degree; ++j) {
+        double buff, dt;
+        dt = mat[i][j]*tmp[j] - err;
+        buff = a2 + dt;
+        err = (buff - a2) - dt;
+        a2 = buff;
+      }
       ans[i] = (res[i] - a1 - a2) / mat[i][i];
-      if (std::abs(ans[i] - tmp[i]) > err)
-        err = std::abs(ans[i] - tmp[i]);
+      if (std::abs(ans[i] - tmp[i]) > diff)
+        diff = std::abs(ans[i] - tmp[i]);
     }
   }
 
   return ans;
+};
+
+double satellite::math::a ( std::list<double> x, unsigned short degree ) {
+  if (!x.size()) return 0;
+  if (!degree) return 1;
+
+  double res = 0, err = 0;
+
+  for (double it_x : x) {
+    double buff, dx;
+
+    dx = std::pow(it_x, degree) / x.size() - err;
+    buff = res + dx;
+    err = (buff - res) - dx;
+    res = buff;
+  }
+
+  return res;
+};
+
+double satellite::math::m ( std::list<double> x, unsigned short degree ) {
+  if (!x.size() || !degree) return 0;
+
+  double res = 0, acc = 0, err = 0;
+
+  for (double it_x : x) {
+    double buff, dx;
+
+    dx = std::pow(it_x, 1) / x.size() - err;
+    buff = acc + dx;
+    err = (buff - acc) - dx;
+    acc = buff;
+  }
+
+  err = 0;
+  for (double it_x : x) {
+    double buff, dx;
+
+    dx = std::pow(it_x - acc, degree) / x.size() - err;
+    buff = res + dx;
+    err = (buff - res) - dx;
+    res = buff;
+  }
+
+  return res;
+};
+
+double satellite::math::cov ( std::list<double> x, std::list<double> y ) {
+  if (!x.size() || !y.size()) return 0;
+  if (x.size() != y.size()) return 0/0.0;
+
+  double res, xy, err;
+  xy = satellite::math::a(x, 1) * satellite::math::a(y, 1);
+  res = err = 0;
+  std::list<double>::iterator it_x, it_y;
+  for (it_x = x.begin(), it_y = y.begin(); it_x != x.end(); ++it_x, ++it_y) {
+    double buff, dx;
+
+    dx = (*it_x)*(*it_y) / x.size() - err;
+    buff = res + dx;
+    err = (buff - res) - dx;
+    res = buff;
+  }
+
+  res -= xy;
+
+  return res;
+
 };
