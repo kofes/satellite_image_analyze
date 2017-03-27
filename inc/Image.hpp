@@ -22,13 +22,13 @@ public:
   const unsigned short height () const {
     return iHeight;
   };
-  inline const unsigned short* operator[] ( unsigned short index ) const {
+  inline const short* operator[] ( unsigned short index ) const {
     return pImage[index];
   };
   void display ( unsigned short width, unsigned short height, unsigned short x0, unsigned short y0, unsigned short dx, unsigned short dy, unsigned short minColor = 0, unsigned short maxColor = 300 );
   void changeMaxMin ( unsigned short minColor, unsigned short maxColor );
   void binary ( unsigned short border );
-  void copy (unsigned short width, unsigned short height, unsigned short** src);
+  void copy ( unsigned short width, unsigned short height, short** src );
 private:
   /*Write image in binary into stream*/
   friend std::ofstream& operator< ( std::ofstream& file, const satellite::Image& img ) {
@@ -41,7 +41,7 @@ private:
     return file;
   }
   unsigned short iWidth, iHeight;
-  unsigned short** pImage;
+  short** pImage;
 };
 #pragma pack(pop)
 };

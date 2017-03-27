@@ -138,7 +138,7 @@ protected:
                                          << vTime.minutes          << ':'
                                          << vTime.seconds          << ':'
                                          << vTime.milliseconds     << '\n'
-         << "Тип данных: "                << pass.getDataType();
+         << "Тип данных: "               << pass.getDataType();
 
     return file;
   }
@@ -176,6 +176,12 @@ public:
   }
   inline unsigned short getCountLines () const {
     return STRINGS_COUNT;
+  }
+  inline unsigned short& setCountPixelsInLine ( unsigned short src ) {
+    return (COUNT_PIXELS = src);
+  }
+  inline unsigned short& setCountLines ( unsigned short src ) {
+    return (STRINGS_COUNT = src);
   }
   inline unsigned short getChannelNum () const {
     return CHANNEL_NUM;

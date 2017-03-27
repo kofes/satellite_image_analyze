@@ -5,7 +5,7 @@
 #include <utility>
 #include <list>
 #include <vector>
-#include "../Image/Image.hpp"
+#include "Image.hpp"
 
 namespace satellite {
 

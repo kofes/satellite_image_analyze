@@ -1,4 +1,4 @@
-#include "Image.hpp"
+#include "../inc/Image.hpp"
 
 satellite::Image::Image ( short width, short height, const std::string& fileName ) {
   std::ifstream file;
@@ -8,13 +8,13 @@ satellite::Image::Image ( short width, short height, const std::string& fileName
   file.open(fileName);
   if (!file.is_open()) return;
 
-  pImage = new unsigned short*[height];
+  pImage = new short*[height];
   if (pImage == nullptr) {
     file.close();
     return;
   }
   for (int i = 0; i < height; ++i) {
-    pImage[i] = new unsigned short[width];
+    pImage[i] = new short[width];
     if (pImage[i] == nullptr) {
       i--;
       while (i-- > 0)
@@ -44,13 +44,13 @@ satellite::Image::Image ( const satellite::Image& img ) {
   iWidth = img.iWidth;
   iHeight = img.iHeight;
 
-  pImage = new unsigned short*[iHeight];
+  pImage = new short*[iHeight];
   if (pImage == nullptr) {
     iWidth = iHeight = 0;
     return;
   }
   for (int i = 0; i < iHeight; ++i) {
-    pImage[i] = new unsigned short[iWidth];
+    pImage[i] = new short[iWidth];
     if (pImage[i] == nullptr) {
       i--;
       while (i-- > 0)
@@ -85,13 +85,13 @@ void satellite::Image::read ( short width, short height, std::ifstream& file ) {
   }
   iWidth = iHeight = 0;
 
-  pImage = new unsigned short*[height];
+  pImage = new short*[height];
   if (pImage == nullptr) {
     file.close();
     return;
   }
   for (int i = 0; i < height; ++i) {
-    pImage[i] = new unsigned short[width];
+    pImage[i] = new short[width];
     if (pImage[i] == nullptr) {
       i--;
       while (i-- > 0)
@@ -149,14 +149,15 @@ void satellite::Image::display ( unsigned short width, unsigned short height, un
 
   for (int i = 0; i < dy; ++i)
     for (int j = 0; j < dx; ++j) {
-      unsigned short color;
+      short color;
       color = pImage[y0 + (dy - i - 1)][x0 + j];
-
-      if (color < minColor) color = minColor;
-      if (color > maxColor) color = maxColor;
-
-      color = color / ((double)maxColor) * 255;
-      imgBuffer.setPixel(j, i, sf::Color(color, color, color));
+      if (color >= 0) {
+        if (color < minColor) color = minColor;
+        if (color > maxColor) color = maxColor;
+        color = color / ((double)maxColor) * 255;
+        imgBuffer.setPixel(j, i, sf::Color(color, color, color));
+      } else
+        imgBuffer.setPixel(j, i, sf::Color(0, 0, 255));
     }
 
 
@@ -250,14 +251,15 @@ void satellite::Image::display ( unsigned short width, unsigned short height, un
 
     for (int i = 0; i < dy; ++i)
       for (int j = 0; j < dx; ++j) {
-        unsigned short color;
+        short color;
         color = pImage[y0 + (dy - i - 1)][x0 + j];
-
-        if (color < minColor) color = minColor;
-        if (color > maxColor) color = maxColor;
-
-        color = color / ((double)maxColor) * 255;
-        imgBuffer.setPixel(j, i, sf::Color(color, color, color));
+        if (color >= 0) {
+          if (color < minColor) color = minColor;
+          if (color > maxColor) color = maxColor;
+          color = color / ((double)maxColor) * 255;
+          imgBuffer.setPixel(j, i, sf::Color(color, color, color));
+        } else
+          imgBuffer.setPixel(j, i, sf::Color(0, 0, 255));
       }
 
 
@@ -297,7 +299,7 @@ void satellite::Image::binary ( unsigned short border ) {
     }
 }
 
-void satellite::Image::copy ( unsigned short width, unsigned short height, unsigned short** src )  {
+void satellite::Image::copy ( unsigned short width, unsigned short height, short** src )  {
   if ( !width || !height || src == nullptr || *src == nullptr )
     return;
 
@@ -308,13 +310,13 @@ void satellite::Image::copy ( unsigned short width, unsigned short height, unsig
   iWidth = width;
   iHeight = height;
 
-  pImage = new unsigned short*[iHeight];
+  pImage = new short*[iHeight];
   if (pImage == nullptr) {
     iWidth = iHeight = 0;
     return;
   }
   for (int i = 0; i < iHeight; ++i) {
-    pImage[i] = new unsigned short[iWidth];
+    pImage[i] = new short[iWidth];
     if (pImage[i] == nullptr) {
       i--;
       while (i-- > 0)

@@ -1,4 +1,4 @@
-#include "Math.hpp"
+#include "../inc/Math.hpp"
 
 std::queue< std::pair<short, short> > satellite::getPixelsInLine ( short x0, short y0, short x1, short y1 ) {
   unsigned short dx = std::abs(x1 - x0);

@@ -1,4 +1,4 @@
-#include "Passport.hpp"
+#include "../inc/Passport.hpp"
 
 satellite::passport::Default::Default ( const std::string& fileName ) {
   std::ifstream file(fileName);
