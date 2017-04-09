@@ -38,12 +38,6 @@ Returns: ``double``
 
 Computes the "correlation" function of the *Image*'s fragment located between points *(X0, Y0)* and *(X1, Y1)* with "log" *H*
 
-##### r ( X0, Y0, X1, Y1, H, Image )
-
-Returns: ``double``
-
-Computes the "correlation" function of the *Image*'s fragment located between points *(X0, Y0)* and *(X1, Y1)* with "log" *H*
-
 ##### g ( X0, Y0, X1, Y1, H, Image )
 
 Returns: ``double``
@@ -126,6 +120,12 @@ Returns: ``std::ofstream&``
 
 Write *Image* to output
 
+##### satellite::Image& setShapes ( X0, Y0, Dx, Dy, {Radius=0}, {Distance=0}, {Err=0}, {Type=Shape::CIRCLE}, {Fill=ShapeFill::DEFAULT} )
+
+Returns: ``void``
+
+Draw shapes (from *enum Shape* with radius (*Radius*) and distance between (in the range from *Distance* \* (1-*err*) to *Distance*) and set it filled (*ShapeFill::SOLID*) or not (*ShapeFill::DEFAULT*)) into rectangle started from *(X0,Y0)* with width *Dx* and height *Dy*
+
 ## Passport
 
-**Image** - module with the implementation of container classes *passport::Default* and *passport::Proection* used to read and present the passport data of satellite-format images (http://www.satellite.dvo.ru/contentid-14.html)
+**Passport** - module with the implementation of container classes *passport::Default* and *passport::Proection* used to read and present the passport data of satellite-format images (http://www.satellite.dvo.ru/contentid-14.html)

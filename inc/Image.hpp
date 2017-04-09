@@ -4,9 +4,22 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <climits>
+#include <random>
+#include <chrono>
 #include <SFML/Graphics.hpp>
 
 namespace satellite {
+
+enum class Shape {
+  CIRCLE,
+  SQUARE
+};
+
+enum class ShapeFill {
+  DEFAULT,
+  SOLID
+};
 
 #pragma pack(push, 1)
 class Image {
@@ -29,6 +42,7 @@ public:
   void changeMaxMin ( unsigned short minColor, unsigned short maxColor );
   void binary ( unsigned short border );
   void copy ( unsigned short width, unsigned short height, short** src );
+  satellite::Image& setShapes ( unsigned short x0, unsigned short y0, unsigned short dx, unsigned short dy, unsigned short radius = 0, short distance = 0, double err = 0, Shape type = Shape::CIRCLE, ShapeFill fill = ShapeFill::DEFAULT );
 private:
   /*Write image in binary into stream*/
   friend std::ofstream& operator< ( std::ofstream& file, const satellite::Image& img ) {

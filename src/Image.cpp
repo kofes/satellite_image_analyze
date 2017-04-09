@@ -1,4 +1,4 @@
-#include "../inc/Image.hpp"
+#include "../inc/Satellite.hpp"
 
 satellite::Image::Image ( short width, short height, const std::string& fileName ) {
   std::ifstream file;
@@ -330,4 +330,83 @@ void satellite::Image::copy ( unsigned short width, unsigned short height, short
   for (int i = 0; i < iHeight; ++i)
     for (int j = 0; j < iWidth; ++j)
       pImage[i][j] = src[i][j];
+};
+
+satellite::Image& satellite::Image::setShapes ( unsigned short x0, unsigned short y0, unsigned short dx, unsigned short dy, unsigned short radius, short distance, double err, satellite::Shape type, satellite::ShapeFill fill ) {
+  unsigned short countX, countY;
+  if (pImage == nullptr || !iWidth || !iHeight || !dx || !dy || x0 + dx > iWidth || y0 + dy > iHeight || (dx / (radius*2 + distance)) <= 0 || (dy / (radius*2 + distance)) <= 0 || std::fabs(err) > 1 || err < 0)
+    return *this;
+
+  unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
+  std::default_random_engine generator(seed);
+  std::uniform_int_distribution<short> distribution(distance - std::abs(distance*err), distance);
+
+  std::list< std::pair<short, short> > lst;
+  std::queue< std::pair<short, short> > tmp;
+
+  switch (type) {
+    case (satellite::Shape::CIRCLE) :
+      tmp = satellite::getPixelsInCircle(0, 0, radius);
+      while (!tmp.empty()) {
+        lst.push_front(tmp.front());
+        tmp.pop();
+      }
+      break;
+    case (satellite::Shape::SQUARE) :
+      for (long i = 0; i <= radius; ++i) {
+        lst.push_front(std::make_pair(-radius, -i));
+        lst.push_front(std::make_pair(+radius, -i));
+        lst.push_front(std::make_pair(-radius, +i));
+        lst.push_front(std::make_pair(+radius, +i));
+        if (fill == satellite::ShapeFill::DEFAULT) {
+          lst.push_front(std::make_pair(-i, -radius));
+          lst.push_front(std::make_pair(-i, +radius));
+          lst.push_front(std::make_pair(+i, -radius));
+          lst.push_front(std::make_pair(+i, +radius));
+        }
+      }
+    break;
+  }
+
+  countX = dx / (radius*2 + distance);
+  countY = dy / (radius*2 + distance);
+
+  switch (fill) {
+    case (satellite::ShapeFill::DEFAULT) :
+      for (unsigned short i = 0; i < countY; ++i)
+        for (unsigned short j = 0; j < countX; ++j) {
+          short dist_x = distribution(generator);
+          short dist_y = distribution(generator);
+          for (auto pr : lst) {
+            if (radius + dist_y/2 + (dy - (radius*2 + dist_y)*countY)/2.0 + (radius*2 + dist_y)*i + pr.second >= 0 &&
+                radius + dist_y/2 + (dy - (radius*2 + dist_y)*countY)/2.0 + (radius*2 + dist_y)*i + pr.second < dy &&
+                radius + dist_x/2 + (dx - (radius*2 + dist_x)*countX)/2.0 + (radius*2 + dist_x)*j + pr.first >= 0 &&
+                radius + dist_x/2 + (dx - (radius*2 + dist_x)*countX)/2.0 + (radius*2 + dist_x)*j + pr.first < dx)
+                pImage[y0 + radius + dist_y/2 + (dy - (radius*2 + dist_y)*countY)/2 + (radius*2 + dist_y)*i + pr.second][x0 + radius + dist_x/2 + (dx - (radius*2 + dist_x)*countX)/2 + (radius*2 + dist_x)*j + pr.first] = sizeof(unsigned short) * (1 << CHAR_BIT) - 1;
+          }
+        }
+    break;
+    case (satellite::ShapeFill::SOLID) :
+      for (unsigned short i = 0; i < countY; ++i)
+        for (unsigned short j = 0; j < countX; ++j) {
+          short dist_x = distribution(generator);
+          short dist_y = distribution(generator);
+          for (auto iter = lst.begin(); iter != lst.end();) {
+            auto pr_1 = *iter; iter++;
+            auto pr_2 = *iter; iter++;
+            tmp = satellite::getPixelsInLine(pr_1.first, pr_1.second, pr_2.first, pr_2.second);
+            while (!tmp.empty()) {
+              auto pr = tmp.front();
+              tmp.pop();
+              if (radius + dist_y/2 + (dy - (radius*2 + dist_y)*countY)/2.0 + (radius*2 + dist_y)*i + pr.second >= 0 &&
+                  radius + dist_y/2 + (dy - (radius*2 + dist_y)*countY)/2.0 + (radius*2 + dist_y)*i + pr.second < dy &&
+                  radius + dist_x/2 + (dx - (radius*2 + dist_x)*countX)/2.0 + (radius*2 + dist_x)*j + pr.first >= 0 &&
+                  radius + dist_x/2 + (dx - (radius*2 + dist_x)*countX)/2.0 + (radius*2 + dist_x)*j + pr.first < dx)
+                  pImage[y0 + radius + dist_y/2 + (dy - (radius*2 + dist_y)*countY)/2 + (radius*2 + dist_y)*i + pr.second][x0 + radius + dist_x/2 + (dx - (radius*2 + dist_x)*countX)/2 + (radius*2 + dist_x)*j + pr.first] = sizeof(unsigned short) * (1 << CHAR_BIT) - 1;
+            }
+          }
+        }
+    break;
+  }
+  return *this;
 };
