@@ -11,4 +11,4 @@ include_directories(../inc)
 add_executable(${PROJECT_NAME} ${SOURCE_EXE})
 
 add_subdirectory(../src)
-target_link_libraries(${PROJECT_NAME} satellite)
+target_link_libraries(${PROJECT_NAME} satellite sfml-system sfml-window sfml-graphics)
