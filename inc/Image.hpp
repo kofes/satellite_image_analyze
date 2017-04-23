@@ -7,7 +7,7 @@
 #include <climits>
 #include <random>
 #include <chrono>
-#include <SFML/Graphics.hpp>
+
 
 namespace satellite {
 
@@ -38,7 +38,6 @@ public:
   inline const short* operator[] ( unsigned short index ) const {
     return pImage[index];
   };
-  void display ( unsigned short width, unsigned short height, unsigned short x0, unsigned short y0, unsigned short dx, unsigned short dy, unsigned short minColor = 0, unsigned short maxColor = 300 );
   void changeMaxMin ( unsigned short minColor, unsigned short maxColor );
   void binary ( unsigned short border );
   void copy ( unsigned short width, unsigned short height, short** src );

@@ -1,4 +1,4 @@
-#include "inc/Satellite.hpp"
+#include "../inc/Display.hpp"
 #include <fstream>
 #include <iostream>
 using namespace satellite;
@@ -14,6 +14,6 @@ int main ( int argc, char const *argv[] ) {
   fp.read(reinterpret_cast<char *>(&height), sizeof(height));
   fp.read(reinterpret_cast<char *>(&width), sizeof(width));
   img.read(width, height, fp);
-  img.display(width, height, 0, 0, width, height);
+  display(img, width, height, 0, 0, width, height);
   return 0;
 }

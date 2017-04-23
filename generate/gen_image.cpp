@@ -1,5 +1,4 @@
-#include "inc/Image.hpp"
-#include "inc/Math.hpp"
+#include "../inc/Satellite.hpp"
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -63,7 +62,6 @@ int main (int argc, char* argv[]) {
   Image img;
   img.copy(width, height, buff);
   img.setShapes(0, 0, width, height, radius, space, err, type, fill);
-  // img.display(width, height, 0, 0, width, height);
   out.write((char*)(&(height)), sizeof(height));
   out.write((char*)(&(width)), sizeof(width));
   out < img;
