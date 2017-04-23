@@ -87,7 +87,7 @@ const Time satellite::passport::Default::getTime () const {
 
 const std::string satellite::passport::Default::getDataType () const {
   switch (DATA_TYPE[0]) {
-    case 0:
+    case 1:
       if (DATA_TYPE[1] == 1)
         return "Исходные данные: HRPT NOAA";
       return "Исходные данные: GMS S-VISSR";

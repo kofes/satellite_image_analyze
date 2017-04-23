@@ -50,6 +50,13 @@ enum SAT_ID {//Идентификаторы ИСЗ
   FY_1d   = 27431
 };
 
+enum class DATA_TYPE : uint8_t {
+  INITIAL_DATA = 1,
+  ONE_CHANNEL = 2,
+  PROECTION = 3,
+  TELEMETRY_DATA = 4
+};
+
 #pragma pack(push, 1)
 struct Default {
 public:
