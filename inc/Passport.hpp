@@ -51,7 +51,7 @@ enum SAT_ID {//Идентификаторы ИСЗ
 };
 
 #pragma pack(push, 1)
-class Default {
+struct Default {
 public:
   Default () {};
   Default ( const passport::Default& src );
@@ -71,7 +71,7 @@ public:
   const Date getDate () const;
   const Time getTime () const;
   const std::string getDataType () const;
-protected:
+// protected:
   uint8_t FFh1_FORMAT;  //0 -- Тип формата - FFh1
   char SAT2_NAME[14];   //1 -- Название ИСЗ2, заглавными буквами
   uint32_t SAT_ID;      //14 -- Идентификатор ИСЗ (см. enum SAT_ID)
@@ -164,7 +164,7 @@ protected:
 
 
 #pragma pack(push, 1)
-class Proection : public passport::Default {
+struct Proection : public passport::Default {
 public:
   Proection () : Default() {};
   Proection ( const std::string& fileName );
@@ -266,7 +266,7 @@ public:
 
     return file;
   }
-private:
+// private:
   uint32_t STAGE_DATA;                  // 64 -- Стадия обработки данных
   uint16_t CHANNEL_NUM;                 // 68 -- Номер канала (возможные значения: 1, 2, 3, 4, 5)
   int16_t SIGNIFICANT_PIXELS_MAX_VALUE; // 70 -- Максимальное значение среди значимых пикселов изображения
