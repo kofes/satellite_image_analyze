@@ -9,7 +9,7 @@ using namespace satellite;
 int main (int argc, char* argv[]) {
   std::ofstream out;
   unsigned short radius = 10, space = 10;
-  unsigned short width = 250, height = 250, countX, countY;
+  unsigned short width = 250, height = 250;
   Shape type = Shape::CIRCLE;
   ShapeFill fill = ShapeFill::SOLID;
   double err = 0;
