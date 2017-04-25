@@ -500,28 +500,27 @@ std::vector<double> satellite::math::leastSquares ( unsigned long int degree, st
   return ans;
 };
 
-double satellite::math::a ( const std::vector<double>& x, unsigned short degree ) {
+double satellite::math::moment ( const std::vector< std::pair<double, unsigned long> >& x, double center, unsigned short degree ) {
   if (!x.size()) return 0;
   if (!degree) return 1;
 
   double res = 0, acc = 0, err = 0;
   size_t i = 1;
 
-  for (double it_x : x) {
+  for (auto it_x : x) {
     double buff, dx;
 
-    dx = it_x - err;
+    dx = it_x.second - err;
     buff = acc + dx;
     err = (buff - acc) - dx;
     acc = buff;
   }
 
   err = 0;
-
-  for (double it_x : x) {
+  for (auto it_x : x) {
     double buff, dx;
 
-    dx = std::pow(i, degree) * (it_x/acc) - err;
+    dx = std::pow(it_x.first - center, degree) * (it_x.second/acc) - err;
     buff = res + dx;
     err = (buff - res) - dx;
     res = buff;
@@ -529,49 +528,28 @@ double satellite::math::a ( const std::vector<double>& x, unsigned short degree 
   }
 
   return res;
+}
+
+double satellite::math::first_row_moment ( const std::vector< std::pair<double, unsigned long> >& x, unsigned short degree ) {
+  return satellite::math::moment(x, 0, 1);
 };
 
-double satellite::math::m ( const std::vector<double>& x, unsigned short degree ) {
-  if (!x.size() || !degree) return 0;
-
-  double res = 0, acc = 0, err = 0, m = satellite::math::a(x);
-  size_t i = 1;
-
-  for (double it_x : x) {
-    double buff, dx;
-
-    dx = it_x - err;
-    buff = acc + dx;
-    err = (buff - acc) - dx;
-    acc = buff;
-  }
-
-  err = 0;
-  for (double it_x : x) {
-    double buff, dx;
-
-    dx = std::pow(i - m, degree) *(it_x/acc) - err;
-    buff = res + dx;
-    err = (buff - res) - dx;
-    res = buff;
-    i++;
-  }
-
-  return res;
+double satellite::math::central_moment ( const std::vector< std::pair<double, unsigned long> >& x, unsigned short degree ) {
+  return satellite::math::moment(x, satellite::math::first_row_moment(x, 1), 2);
 };
 
-double satellite::math::cov ( const std::vector<double>& x, const std::vector<double>& y ) {
+double satellite::math::cov ( const std::vector< std::pair<double, unsigned long> >& x, const std::vector< std::pair<double, unsigned long> >& y ) {
   if (!x.size() || !y.size()) return 0;
   if (x.size() != y.size()) return 0/0.0;
 
   double res, xy, err;
-  xy = satellite::math::a(x, 1) * satellite::math::a(y, 1);
+  xy = satellite::math::first_row_moment(x, 1) * satellite::math::first_row_moment(y, 1);
   res = err = 0;
-  std::vector<double>::const_iterator it_x, it_y;
+  std::vector< std::pair<double, unsigned long> >::const_iterator it_x, it_y;
   for (it_x = x.begin(), it_y = y.begin(); it_x != x.end(); ++it_x, ++it_y) {
     double buff, dx;
 
-    dx = (*it_x)*(*it_y) / x.size() - err;
+    dx = (it_x->second)*(it_y->second) / x.size() - err;
     buff = res + dx;
     err = (buff - res) - dx;
     res = buff;

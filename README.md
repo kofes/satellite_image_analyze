@@ -50,13 +50,19 @@ Returns: ``std::vector<double>``
 
 Computes the coefficients of the polynomial function with a degree of *Degree* using the least squares method (for solving the resulting system of linear algebraic equations used Gauss-Seidel method with the error *Diff*)
 
-##### a ( X, {Degree = 1} )
+##### moment ( X, {Central = 0, {Degree = 1}} )
+
+Returns: ``double``
+
+Computes the "moment" function of the vector *X*
+
+##### first_row_moment ( X, {Degree = 1} )
 
 Returns: ``double``
 
 Computes the "row moment" function of the vector *X*
 
-##### m ( X, {Degree = 2} )
+##### central_moment ( X, {Degree = 2} )
 
 Returns: ``double``
 
