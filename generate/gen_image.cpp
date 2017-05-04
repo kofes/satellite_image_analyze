@@ -52,9 +52,6 @@ int main (int argc, char* argv[]) {
   for (int i = 0; i < height; ++i)
   buff[i] = new short [width];
 
-  countX = width / (radius*2 + space);
-  countY = height / (radius*2 + space);
-
   for (long int i = 0; i < height; ++i)
     for (long int j = 0; j < width; ++j)
       buff[i][j] = 0x00;
