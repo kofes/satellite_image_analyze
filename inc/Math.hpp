@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <limits>
 #include <queue>
 #include <utility>
 #include <list>
@@ -79,13 +80,15 @@ double g ( short x0, short y0, short x1, short y1, double h, satellite::Image& p
 //Get approximated function by Gauss–Seidel method
 std::vector<double> leastSquares ( unsigned long int degree, std::list<double> x, std::list<double> y, double maxDiff = 1e-2 );
 
-double moment ( const std::vector< std::pair<double, unsigned long> >& x, double center = 0, unsigned short degree = 1 );
+double moment ( const std::vector< std::pair<double, unsigned long> >& x, double center = 0, unsigned short degree = 1, double min = std::numeric_limits<double>::min(), double max = std::numeric_limits<double>::max() );
 
 double first_row_moment ( const std::vector< std::pair<double, unsigned long> >& x, unsigned short degree = 1 );
 
 double central_moment ( const std::vector< std::pair<double, unsigned long> >& x, unsigned short degree = 2 );
 
 double cov ( const std::vector< std::pair<double, unsigned long> >& x, const std::vector< std::pair<double, unsigned long> >& y );
+
+size_t threshold_Otsu ( const std::vector< std::pair<double, unsigned long> >& x );
 
 };
 };

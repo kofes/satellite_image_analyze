@@ -39,6 +39,7 @@ public:
     return pImage[index];
   };
   void changeMaxMin ( unsigned short minColor, unsigned short maxColor );
+  void cropColor ( unsigned short minColor, unsigned short maxColor );
   void binary ( unsigned short border );
   void copy ( unsigned short width, unsigned short height, short** src );
   satellite::Image& setShapes ( unsigned short x0, unsigned short y0, unsigned short dx, unsigned short dy, unsigned short radius = 0, short distance = 0, double err = 0, Shape type = Shape::CIRCLE, ShapeFill fill = ShapeFill::DEFAULT );

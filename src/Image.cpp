@@ -121,6 +121,19 @@ void satellite::Image::changeMaxMin ( unsigned short minColor, unsigned short ma
     }
 };
 
+void satellite::Image::cropColor ( unsigned short minColor, unsigned short maxColor ) {
+  if ( pImage == nullptr || !iWidth || !iHeight )
+    return;
+
+  for (int i = 0; i < iHeight; ++i)
+    for (int j = 0; j < iWidth; ++j) {
+      if ( pImage[i][j] > maxColor )
+        pImage[i][j] = 0;
+      if ( pImage[i][j] < minColor )
+        pImage[i][j] = 0;
+    }
+};
+
 void satellite::Image::binary ( unsigned short border ) {
   if ( pImage == nullptr || !iWidth || !iHeight )
     return;

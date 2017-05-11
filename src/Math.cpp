@@ -77,11 +77,13 @@ satellite::math::Pack satellite::math::Pack::calc (  short x0, short y0, short x
       while (y >= 0) {
         if (j + y < y1 && i + x < x1) {
           ++count;
-          _drift += picture[j + y][i + x] - picture[j][i];
-          _covariance += picture[j][i] * picture[j + y][i + x];
-          _semivariance += (picture[j][i] - picture[j + y][i + x])*(picture[j][i] - picture[j + y][i + x]);
-          m_0 += picture[j][i];
-          m_h += picture[j + y][i + x];
+          short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+          short point_h = (picture[j+y][i+x] < 0) ? 0 : picture[j+y][i+x];
+          _drift += point_0 - point_h;
+          _covariance += point_0 * point_h;
+          _semivariance += (point_0 - point_h)*(point_0 - point_h);
+          m_0 += point_0;
+          m_h += point_h;
         }
         err = 2 * (delta + y) - 1;
         if ((delta < 0) && (err <= 0)) {
@@ -124,7 +126,8 @@ double satellite::math::m ( short x0, short y0, short x1, short y1, satellite::I
   while (!que.empty()) {
     auto pr = que.front();
     que.pop();
-    result += picture[pr.first][pr.second];
+    short point = (picture[pr.first][pr.second] < 0) ? 0 : picture[pr.first][pr.second];
+    result += point;
   }
   result /= std::sqrt((y1 - y0)*(y1 - y0) + (x1 - x0)*(x1 - x0));
 
@@ -149,7 +152,8 @@ double satellite::math::m0 ( short x0, short y0, short x1, short y1, double h, s
       while (y >= 0) {
         if (j + y < y1 && i + x < x1) {
           ++count;
-          result += picture[j][i];
+          short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+          result += point_0;
         }
         err = 2 * (delta + y) - 1;
         if ((delta < 0) && (err <= 0)) {
@@ -190,7 +194,8 @@ double satellite::math::mh ( short x0, short y0, short x1, short y1, double h, s
         while (y >= 0) {
           if (j + y < y1 && i + x < x1) {
             ++count;
-            result += picture[j + y][i + x];
+            short point_h = (picture[j+y][i+x] < 0) ? 0 : picture[j+y][i+x];
+            result += point_h;
           }
           err = 2 * (delta + y) - 1;
           if ((delta < 0) && (err <= 0)) {
@@ -233,7 +238,8 @@ double satellite::math::s0 ( short x0, short y0, short x1, short y1, double h, s
       while (y >= 0) {
         if (j + y < y1 && i + x < x1) {
           ++count;
-          result += (picture[j][i] - dm)*(picture[j][i] - dm);
+          short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+          result += (point_0 - dm)*(point_0 - dm);
         }
         err = 2 * (delta + y) - 1;
         if ((delta < 0) && (err <= 0)) {
@@ -276,7 +282,8 @@ double satellite::math::sh ( short x0, short y0, short x1, short y1, double h, s
       while (y >= 0) {
         if (j + y < y1 && i + x < x1) {
           ++count;
-          result += (picture[j + y][i + x] - dm)*(picture[j + y][i + x] - dm);
+          short point_h = (picture[j+y][i+x] < 0) ? 0 : picture[j+y][i+x];
+          result += (point_h - dm)*(point_h - dm);
         }
         err = 2 * (delta + y) - 1;
         if ((delta < 0) && (err <= 0)) {
@@ -317,7 +324,9 @@ double satellite::math::d ( short x0, short y0, short x1, short y1, double h, sa
       while (y >= 0) {
         if (j + y < y1 && i + x < x1) {
           ++count;
-          result += picture[j + y][i + x] - picture[j][i];
+          short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+          short point_h = (picture[j+y][i+x] < 0) ? 0 : picture[j+y][i+x];
+          result += point_h - point_0;
         }
         err = 2 * (delta + y) - 1;
         if ((delta < 0) && (err <= 0)) {
@@ -358,7 +367,9 @@ double satellite::math::cov ( short x0, short y0, short x1, short y1, double h, 
       while (y >= 0) {
         if (j + y < y1 && i + x < x1) {
           ++count;
-          result += picture[j][i] * picture[j + y][i + x];
+          short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+          short point_h = (picture[j+y][i+x] < 0) ? 0 : picture[j+y][i+x];
+          result += point_0 * point_h;
         }
         err = 2 * (delta + y) - 1;
         if ((delta < 0) && (err <= 0)) {
@@ -409,7 +420,9 @@ double satellite::math::g ( short x0, short y0, short x1, short y1, double h, sa
       while (y >= 0) {
         if (j + y < y1 && i + x < x1) {
           ++count;
-          result += (picture[j][i] - picture[j + y][i + x])*(picture[j][i] - picture[j + y][i + x]);
+          short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+          short point_h = (picture[j+y][i+x] < 0) ? 0 : picture[j+y][i+x];
+          result += (point_0 - point_h)*(point_0 - point_h);
         }
         err = 2 * (delta + y) - 1;
         if ((delta < 0) && (err <= 0)) {
@@ -500,7 +513,7 @@ std::vector<double> satellite::math::leastSquares ( unsigned long int degree, st
   return ans;
 };
 
-double satellite::math::moment ( const std::vector< std::pair<double, unsigned long> >& x, double center, unsigned short degree ) {
+double satellite::math::moment ( const std::vector< std::pair<double, unsigned long> >& x, double center, unsigned short degree, double min, double max ) {
   if (!x.size()) return 0;
   if (!degree) return 1;
 
@@ -508,6 +521,9 @@ double satellite::math::moment ( const std::vector< std::pair<double, unsigned l
   size_t i = 1;
 
   for (auto it_x : x) {
+    if (it_x.first > max || it_x.first < min)
+      continue;
+
     double buff, dx;
 
     dx = it_x.second - err;
@@ -518,6 +534,9 @@ double satellite::math::moment ( const std::vector< std::pair<double, unsigned l
 
   err = 0;
   for (auto it_x : x) {
+    if (it_x.first > max || it_x.first < min)
+      continue;
+
     double buff, dx;
 
     dx = std::pow(it_x.first - center, degree) * (it_x.second/acc) - err;
@@ -560,3 +579,39 @@ double satellite::math::cov ( const std::vector< std::pair<double, unsigned long
   return res;
 
 };
+
+size_t satellite::math::threshold_Otsu ( const std::vector< std::pair<double, unsigned long> >& x ) {
+  // Введем два вспомогательных числа:
+  long m = 0; // m - сумма высот всех бинов, домноженных на положение их середины
+  long n = 0; // n - сумма высот всех бинов
+  for (size_t t = 0; t < x.size(); ++t) {
+    m += t * x[t].second;//temp
+    n += x[t].second;//temp1
+  }
+
+  double maxSigma = -1; // Максимальное значение межклассовой дисперсии
+  size_t threshold = 0; // Порог, соответствующий maxSigma
+
+  long alpha = 0; // Сумма высот всех бинов для класса 1
+  long beta = 0; // Сумма высот всех бинов для класса 1, домноженных на положение их середины
+
+  for (size_t t = 0; t < x.size()-1; t++) {
+    double w1, a, sigma;
+
+    alpha += t* x[t].second;
+    beta += x[t].second;
+
+    w1 = (double)beta / n;
+    a = (double)alpha / beta - (m - alpha) / (n - beta);
+    sigma = w1 * (1 - w1) * a * a;
+
+    std::cout << "--------\nt: " << t << std::endl;
+    if (sigma > maxSigma) {
+      maxSigma = sigma;
+      threshold = t;
+      std::cout << "T: " << t << std::endl;
+    }
+  }
+
+  return threshold;
+}
