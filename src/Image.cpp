@@ -16,7 +16,6 @@ satellite::Image::Image ( short width, short height, const std::string& fileName
   for (int i = 0; i < height; ++i) {
     pImage[i] = new short[width];
     if (pImage[i] == nullptr) {
-      i--;
       while (i-- > 0)
         delete[] pImage[i];
       delete[] pImage;
@@ -52,7 +51,6 @@ satellite::Image::Image ( const satellite::Image& img ) {
   for (int i = 0; i < iHeight; ++i) {
     pImage[i] = new short[iWidth];
     if (pImage[i] == nullptr) {
-      i--;
       while (i-- > 0)
         delete[] pImage[i];
       delete[] pImage;
@@ -93,7 +91,6 @@ void satellite::Image::read ( short width, short height, std::ifstream& file ) {
   for (int i = 0; i < height; ++i) {
     pImage[i] = new short[width];
     if (pImage[i] == nullptr) {
-      i--;
       while (i-- > 0)
         delete[] pImage[i];
       delete[] pImage;
