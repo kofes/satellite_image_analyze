@@ -517,44 +517,39 @@ double satellite::math::moment ( const std::vector< std::pair<double, unsigned l
   if (!x.size()) return 0;
   if (!degree) return 1;
 
+  if (min < 0) min = 0;
+  if (max > x.size()) max = x.size();
+
   double res = 0, acc = 0, err = 0;
-  size_t i = 1;
 
-  for (auto it_x : x) {
-    if (it_x.first > max || it_x.first < min)
-      continue;
-
+  for (size_t i = min; i < max; ++i) {
     double buff, dx;
 
-    dx = it_x.second - err;
+    dx = x[i].second - err;
     buff = acc + dx;
     err = (buff - acc) - dx;
     acc = buff;
   }
 
   err = 0;
-  for (auto it_x : x) {
-    if (it_x.first > max || it_x.first < min)
-      continue;
-
+  for (size_t i = min; i < max; ++i) {
     double buff, dx;
 
-    dx = std::pow(it_x.first - center, degree) * (it_x.second/acc) - err;
+    dx = std::pow(x[i].first - center, degree) * (x[i].second/acc) - err;
     buff = res + dx;
     err = (buff - res) - dx;
     res = buff;
-    i++;
   }
 
   return res;
 }
 
-double satellite::math::first_row_moment ( const std::vector< std::pair<double, unsigned long> >& x, unsigned short degree ) {
-  return satellite::math::moment(x, 0, 1);
+double satellite::math::first_row_moment ( const std::vector< std::pair<double, unsigned long> >& x, unsigned short degree, double min, double max ) {
+  return satellite::math::moment(x, 0, degree, min, max);
 };
 
-double satellite::math::central_moment ( const std::vector< std::pair<double, unsigned long> >& x, unsigned short degree ) {
-  return satellite::math::moment(x, satellite::math::first_row_moment(x, 1), 2);
+double satellite::math::central_moment ( const std::vector< std::pair<double, unsigned long> >& x, unsigned short degree, double min, double max ) {
+  return satellite::math::moment(x, satellite::math::first_row_moment(x, 1, min, max), degree, min, max);
 };
 
 double satellite::math::cov ( const std::vector< std::pair<double, unsigned long> >& x, const std::vector< std::pair<double, unsigned long> >& y ) {
@@ -580,38 +575,19 @@ double satellite::math::cov ( const std::vector< std::pair<double, unsigned long
 
 };
 
-size_t satellite::math::threshold_Otsu ( const std::vector< std::pair<double, unsigned long> >& x ) {
-  // Введем два вспомогательных числа:
-  long m = 0; // m - сумма высот всех бинов, домноженных на положение их середины
-  long n = 0; // n - сумма высот всех бинов
-  for (size_t t = 0; t < x.size(); ++t) {
-    m += t * x[t].second;//temp
-    n += x[t].second;//temp1
-  }
+std::pair<size_t, double> satellite::math::threshold_Otsu ( const std::vector< std::pair<double, unsigned long> >& x ) {
+  size_t threshold = 0;
+  double sc_max, sc_curr, disp_full;
+  sc_max = 0;
+  disp_full = satellite::math::central_moment(x);
 
-  double maxSigma = -1; // Максимальное значение межклассовой дисперсии
-  size_t threshold = 0; // Порог, соответствующий maxSigma
-
-  long alpha = 0; // Сумма высот всех бинов для класса 1
-  long beta = 0; // Сумма высот всех бинов для класса 1, домноженных на положение их середины
-
-  for (size_t t = 0; t < x.size()-1; t++) {
-    double w1, a, sigma;
-
-    alpha += t* x[t].second;
-    beta += x[t].second;
-
-    w1 = (double)beta / n;
-    a = (double)alpha / beta - (m - alpha) / (n - beta);
-    sigma = w1 * (1 - w1) * a * a;
-
-    std::cout << "--------\nt: " << t << std::endl;
-    if (sigma > maxSigma) {
-      maxSigma = sigma;
+  for (size_t t = 1; t < x.size(); ++t) {
+    sc_curr = 1 - (satellite::math::central_moment(x, 2, 0, t) + satellite::math::central_moment(x, 2, t, x.size()))/disp_full;
+    if (sc_curr > sc_max) {
+      sc_max = sc_curr;
       threshold = t;
-      std::cout << "T: " << t << std::endl;
     }
   }
 
-  return threshold;
+  return std::make_pair(threshold, sc_max);
 }

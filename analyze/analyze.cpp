@@ -89,8 +89,8 @@ void clac_one_dist( std::ifstream& input, std::ofstream& output ) {
 void clac_two_dist( std::ifstream& input, std::ofstream& output ) {
   std::vector< std::pair<double, unsigned long> > buff;
   short min, max;
-  double dh, E, D,
-             minus_m, plus_m,
+  std::pair<size_t, double> res;
+  double dh, minus_m, plus_m,
              minus_d, plus_d;
 
   if (!input.is_open()) {
@@ -106,28 +106,15 @@ void clac_two_dist( std::ifstream& input, std::ofstream& output ) {
     buff.push_back(std::make_pair((i+min+1)*dh, tmp));
   }
 
-  E = math::first_row_moment(buff);
-  D = math::central_moment(buff);
 
-  minus_m = 0;
-  plus_m = max-min;
+  res = satellite::math::threshold_Otsu(buff);
 
-  for (unsigned short i = 0; i < std::trunc(E)-min+1; ++i)
-    minus_m = (buff[minus_m].second > buff[i].second) ? minus_m : i;
-
-  for (unsigned short i = std::trunc(E)-min+1; i < buff.size(); ++i)
-    plus_m = (buff[plus_m].second > buff[i].second) ? plus_m : i;
-
-  minus_m = buff[minus_m].first;
-  minus_d = math::moment(buff, buff[minus_m].first, 2);
-
-  plus_m = buff[plus_m].first;
-  plus_d = math::moment(buff, buff[plus_m].first, 2);
-
-  if (D < minus_d + plus_d) {
-    minus_d = minus_d * ( D / (minus_d + plus_d));
-    plus_d = D - minus_d;
-  }
+  std::cout << "Threshold: " << res.first << std::endl;
+  std::cout << "SC: " << res.second << std::endl;
+  minus_m = satellite::math::first_row_moment(buff, 1, 0, res.first);
+  minus_d = satellite::math::central_moment(buff, 2, 0, res.first);
+  plus_m = satellite::math::first_row_moment(buff, 1, res.first, buff.size());
+  plus_d = satellite::math::central_moment(buff, 2, res.first, buff.size());
 
   output << minus_m << ' ' << minus_d << std::endl;
   output << plus_m << ' ' << plus_d << std::endl;
