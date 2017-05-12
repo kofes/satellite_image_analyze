@@ -111,6 +111,8 @@ void satellite::Image::changeMaxMin ( unsigned short minColor, unsigned short ma
 
   for (int i = 0; i < iHeight; ++i)
     for (int j = 0; j < iWidth; ++j) {
+      if ( pImage[i][j] < 0 )
+        continue;
       if ( pImage[i][j] > maxColor )
         pImage[i][j] = maxColor;
       if ( pImage[i][j] < minColor )
@@ -124,6 +126,8 @@ void satellite::Image::cropColor ( unsigned short minColor, unsigned short maxCo
 
   for (int i = 0; i < iHeight; ++i)
     for (int j = 0; j < iWidth; ++j) {
+      if ( pImage[i][j] < 0 )
+        continue;
       if ( pImage[i][j] > maxColor )
         pImage[i][j] = 0;
       if ( pImage[i][j] < minColor )
@@ -137,6 +141,8 @@ void satellite::Image::binary ( unsigned short border ) {
 
   for (int i = 0; i < iHeight; ++i)
     for (int j = 0; j < iWidth; ++j) {
+      if ( pImage[i][j] < 0 )
+        continue;
       if ( pImage[i][j] >= border )
         pImage[i][j] = 255;
       else
@@ -163,7 +169,6 @@ void satellite::Image::copy ( unsigned short width, unsigned short height, short
   for (int i = 0; i < iHeight; ++i) {
     pImage[i] = new short[iWidth];
     if (pImage[i] == nullptr) {
-      i--;
       while (i-- > 0)
         delete[] pImage[i];
       delete[] pImage;
