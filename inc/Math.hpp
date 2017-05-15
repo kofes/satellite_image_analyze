@@ -55,28 +55,28 @@ private:
 double m ( short x0, short y0, short x1, short y1, satellite::Image& picture);
 
 //First moment +0 of matrix with log h
-double m0 ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture );
+double m0 ( short x0, short y0, short x1, short y1, int h, satellite::Image& picture );
 
 //First moment +h of matrix with log h
-double mh ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture );
+double mh ( short x0, short y0, short x1, short y1, int h, satellite::Image& picture );
 
 //Corresponding standard deviation +0 of matrix with log h
-double s0 ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture );
+double s0 ( short x0, short y0, short x1, short y1, int h, satellite::Image& picture );
 
 //Corresponding standard deviation +h of matrix with log h
-double sh ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture );
+double sh ( short x0, short y0, short x1, short y1, int h, satellite::Image& picture );
 
 //Drift of matrix with log h
-double d ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture );
+double d ( short x0, short y0, short x1, short y1, int h, satellite::Image& picture );
 
 //Covariation of matrix with log h
-double cov ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture );
+double cov ( short x0, short y0, short x1, short y1, int h, satellite::Image& picture );
 
 //Correlation of matrix with log h
-double r ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture );
+double r ( short x0, short y0, short x1, short y1, int h, satellite::Image& picture );
 
 //Semivariance of matrix with log h
-double g ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture );
+double g ( short x0, short y0, short x1, short y1, int h, satellite::Image& picture );
 
 //Get approximated function by Gauss–Seidel method
 std::vector<double> leastSquares ( unsigned long int degree, std::list<double> x, std::list<double> y, double maxDiff = 1e-2 );

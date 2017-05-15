@@ -134,13 +134,13 @@ double satellite::math::m ( short x0, short y0, short x1, short y1, satellite::I
   return result;
 };
 
-double satellite::math::m0 ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture ) {
+double satellite::math::m0 ( short x0, short y0, short x1, short y1, int h, satellite::Image& picture ) {
   double result = 0;
   unsigned int count = 0;
 
   if (x0 < 0 || x1 > picture.width() || y0 < 0 || y1 > picture.height() || x1 < 0 || y1 < 0)
     return -1;
-  if (h <= 1e-5 || !(x1 - x0) || !(y1 - y0))
+  if (h <= 0 || !(x1 - x0) || !(y1 - y0))
     return 0;
 
   for (int j = y0; j < y1; ++j)
@@ -176,13 +176,13 @@ double satellite::math::m0 ( short x0, short y0, short x1, short y1, double h, s
   return result;
 };
 
-double satellite::math::mh ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture ) {
+double satellite::math::mh ( short x0, short y0, short x1, short y1, int h, satellite::Image& picture ) {
   double result = 0;
   unsigned int count = 0;
 
   if (x0 < 0 || x1 > picture.width() || y0 < 0 || y1 > picture.height() || x1 < 0 || y1 < 0)
     return -1;
-  if (h <= 1e-5 || !(x1 - x0) || !(y1 - y0))
+  if (h <= 0 || !(x1 - x0) || !(y1 - y0))
     return 0;
 
     for (int j = y0; j < y1; ++j)
@@ -218,13 +218,13 @@ double satellite::math::mh ( short x0, short y0, short x1, short y1, double h, s
   return result;
 };
 
-double satellite::math::s0 ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture ) {
+double satellite::math::s0 ( short x0, short y0, short x1, short y1, int h, satellite::Image& picture ) {
   double result = 0;
   unsigned int count = 0;
 
   if (x0 < 0 || x1 > picture.width() || y0 < 0 || y1 > picture.height() || x1 < 0 || y1 < 0)
     return -1;
-  if (h <= 1e-5 || !(x1 - x0) || !(y1 - y0))
+  if (h <= 0 || !(x1 - x0) || !(y1 - y0))
     return 0;
 
   double dm = satellite::math::m0(x0, y0, x1, y1, h, picture);
@@ -262,13 +262,13 @@ double satellite::math::s0 ( short x0, short y0, short x1, short y1, double h, s
   return result;
 };
 
-double satellite::math::sh ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture ) {
+double satellite::math::sh ( short x0, short y0, short x1, short y1, int h, satellite::Image& picture ) {
   double result = 0;
   unsigned int count = 0;
 
   if (x0 < 0 || x1 > picture.width() || y0 < 0 || y1 > picture.height() || x1 < 0 || y1 < 0)
     return -1;
-  if (h <= 1e-5 || !(x1 - x0) || !(y1 - y0))
+  if (h <= 0 || !(x1 - x0) || !(y1 - y0))
     return 0;
 
   double dm = satellite::math::mh(x0, y0, x1, y1, h, picture);
@@ -306,13 +306,13 @@ double satellite::math::sh ( short x0, short y0, short x1, short y1, double h, s
   return result;
 };
 
-double satellite::math::d ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture ) {
+double satellite::math::d ( short x0, short y0, short x1, short y1, int h, satellite::Image& picture ) {
   double result = 0;
   unsigned int count = 0;
 
   if (x0 < 0 || x1 > picture.width() || y0 < 0 || y1 > picture.height() || x1 < 0 || y1 < 0)
     return -1;
-  if (h <= 1e-5 || !(x1 - x0) || !(y1 - y0))
+  if (h <= 0 || !(x1 - x0) || !(y1 - y0))
     return 0;
 
   for (int j = y0; j < y1; ++j)
@@ -349,13 +349,13 @@ double satellite::math::d ( short x0, short y0, short x1, short y1, double h, sa
   return result;
 };
 
-double satellite::math::cov ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture ) {
+double satellite::math::cov ( short x0, short y0, short x1, short y1, int h, satellite::Image& picture ) {
   double result = 0;
   unsigned int count = 0;
 
   if (x0 < 0 || x1 > picture.width() || y0 < 0 || y1 > picture.height() || x1 < 0 || y1 < 0)
     return -1;
-  if (h <= 1e-5 || !(x1 - x0) || !(y1 - y0))
+  if (h <= 0 || !(x1 - x0) || !(y1 - y0))
     return 0;
 
   for (int j = y0; j < y1; ++j)
@@ -395,20 +395,20 @@ double satellite::math::cov ( short x0, short y0, short x1, short y1, double h, 
   return result;
 };
 
-double satellite::math::r ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture ) {
+double satellite::math::r ( short x0, short y0, short x1, short y1, int h, satellite::Image& picture ) {
   double dv = std::sqrt(satellite::math::s0(x0, y0, x1, y1, h, picture) * satellite::math::sh(x0, y0, x1, y1, h, picture));
   if (std::abs(dv) < 1e-5)
     return 0;
   return satellite::math::cov(x0, y0, x1, y1, h, picture) / dv;
 };
 
-double satellite::math::g ( short x0, short y0, short x1, short y1, double h, satellite::Image& picture ) {
+double satellite::math::g ( short x0, short y0, short x1, short y1, int h, satellite::Image& picture ) {
   double result = 0;
   unsigned int count = 0;
 
   if (x0 < 0 || x1 > picture.width() || y0 < 0 || y1 > picture.height() || x1 < 0 || y1 < 0)
     return -1;
-  if (h <= 1e-5 || !(x1 - x0) || !(y1 - y0))
+  if (h <= 0 || !(x1 - x0) || !(y1 - y0))
     return 0;
 
   for (int j = y0; j < y1; ++j)
