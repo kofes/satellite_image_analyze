@@ -13,7 +13,7 @@ satellite::Image::Image ( short width, short height, const std::string& fileName
     file.close();
     return;
   }
-  for (int i = 0; i < height; ++i) {
+  for (size_t i = 0; i < height; ++i) {
     pImage[i] = new short[width];
     if (pImage[i] == nullptr) {
       while (i-- > 0)
@@ -27,10 +27,16 @@ satellite::Image::Image ( short width, short height, const std::string& fileName
   iWidth = width;
   iHeight = height;
 
-  for (int i = 0; i < height; ++i)
+  for (size_t i = 0; i < height; ++i)
     file.read(reinterpret_cast<char *>(pImage[i]), sizeof(short)*width);
-
   file.close();
+  iMin = 0;
+  iMax = 1;
+  for (size_t i = 0; i < height; ++i)
+    for (size_t j = 0; j < width; ++j) {
+      iMax = (iMax < pImage[i][j]) ? pImage[i][j] : iMax;
+      iMin = (iMin > pImage[i][j] && pImage[i][j] > 0) ? pImage[i][j] : iMin;
+    }
 };
 
 satellite::Image::Image ( const satellite::Image& img ) {
@@ -48,7 +54,7 @@ satellite::Image::Image ( const satellite::Image& img ) {
     iWidth = iHeight = 0;
     return;
   }
-  for (int i = 0; i < iHeight; ++i) {
+  for (size_t i = 0; i < iHeight; ++i) {
     pImage[i] = new short[iWidth];
     if (pImage[i] == nullptr) {
       while (i-- > 0)
@@ -59,14 +65,19 @@ satellite::Image::Image ( const satellite::Image& img ) {
     }
   }
 
-  for (unsigned short i = 0; i < iHeight; ++i)
-    for (unsigned short j = 0; j < iWidth; ++j)
+  iMin = 0;
+  iMax = 1;
+  for (size_t i = 0; i < iHeight; ++i)
+    for (size_t j = 0; j < iWidth; ++j) {
       pImage[i][j] = img.pImage[i][j];
+      iMax = (iMax < pImage[i][j]) ? pImage[i][j] : iMax;
+      iMin = (iMin > pImage[i][j] && pImage[i][j] > 0) ? pImage[i][j] : iMin;
+    }
 }
 
 satellite::Image::~Image () {
   if (pImage != nullptr) {
-    for (int i = 0; i < iHeight; ++i)
+    for (size_t i = 0; i < iHeight; ++i)
       delete[] pImage[i];
     delete[] pImage;
   }
@@ -88,7 +99,7 @@ void satellite::Image::read ( short width, short height, std::ifstream& file ) {
     file.close();
     return;
   }
-  for (int i = 0; i < height; ++i) {
+  for (size_t i = 0; i < height; ++i) {
     pImage[i] = new short[width];
     if (pImage[i] == nullptr) {
       while (i-- > 0)
@@ -101,18 +112,26 @@ void satellite::Image::read ( short width, short height, std::ifstream& file ) {
   iWidth = width;
   iHeight = height;
 
-  for (int i = 0; i < height; ++i)
+  for (size_t i = 0; i < height; ++i)
     file.read(reinterpret_cast<char *>(pImage[i]), sizeof(short)*width);
+  iMin = 0;
+  iMax = 1;
+  for (size_t i = 0; i < height; ++i)
+    for (size_t j = 0; j < width; ++j) {
+      iMax = (iMax < pImage[i][j]) ? pImage[i][j] : iMax;
+      iMin = (iMin > pImage[i][j] && pImage[i][j] > 0) ? pImage[i][j] : iMin;
+    }
 }
 
 void satellite::Image::changeMaxMin ( unsigned short minColor, unsigned short maxColor ) {
   if ( pImage == nullptr || !iWidth || !iHeight )
     return;
-
-  for (int i = 0; i < iHeight; ++i)
-    for (int j = 0; j < iWidth; ++j) {
+  iMin = minColor;
+  iMax = maxColor;
+  for (size_t i = 0; i < iHeight; ++i)
+    for (size_t j = 0; j < iWidth; ++j) {
       if ( pImage[i][j] < 0 )
-        continue;
+          continue;
       if ( pImage[i][j] > maxColor )
         pImage[i][j] = maxColor;
       if ( pImage[i][j] < minColor )
@@ -123,9 +142,10 @@ void satellite::Image::changeMaxMin ( unsigned short minColor, unsigned short ma
 void satellite::Image::cropColor ( unsigned short minColor, unsigned short maxColor ) {
   if ( pImage == nullptr || !iWidth || !iHeight )
     return;
-
-  for (int i = 0; i < iHeight; ++i)
-    for (int j = 0; j < iWidth; ++j) {
+  iMin = minColor;
+  iMax = maxColor;
+  for (size_t i = 0; i < iHeight; ++i)
+    for (size_t j = 0; j < iWidth; ++j) {
       if ( pImage[i][j] < 0 )
         continue;
       if ( pImage[i][j] > maxColor )
@@ -138,9 +158,10 @@ void satellite::Image::cropColor ( unsigned short minColor, unsigned short maxCo
 void satellite::Image::binary ( unsigned short border ) {
   if ( pImage == nullptr || !iWidth || !iHeight )
     return;
-
-  for (int i = 0; i < iHeight; ++i)
-    for (int j = 0; j < iWidth; ++j) {
+  iMin = 0;
+  iMax = 255;
+  for (size_t i = 0; i < iHeight; ++i)
+    for (size_t j = 0; j < iWidth; ++j) {
       if ( pImage[i][j] < 0 )
         continue;
       if ( pImage[i][j] >= border )
@@ -154,7 +175,7 @@ void satellite::Image::copy ( unsigned short width, unsigned short height, short
   if ( !width || !height || src == nullptr || *src == nullptr )
     return;
 
-  for (unsigned short i = 0; i < iHeight; ++i)
+  for (size_t i = 0; i < iHeight; ++i)
     delete[] pImage[i];
   delete[] pImage;
 
@@ -166,7 +187,7 @@ void satellite::Image::copy ( unsigned short width, unsigned short height, short
     iWidth = iHeight = 0;
     return;
   }
-  for (int i = 0; i < iHeight; ++i) {
+  for (size_t i = 0; i < iHeight; ++i) {
     pImage[i] = new short[iWidth];
     if (pImage[i] == nullptr) {
       while (i-- > 0)
@@ -177,9 +198,14 @@ void satellite::Image::copy ( unsigned short width, unsigned short height, short
     }
   }
 
-  for (int i = 0; i < iHeight; ++i)
-    for (int j = 0; j < iWidth; ++j)
+  iMin = 0;
+  iMax = 1;
+  for (size_t i = 0; i < iHeight; ++i)
+    for (size_t j = 0; j < iWidth; ++j) {
       pImage[i][j] = src[i][j];
+      iMax = (iMax < pImage[i][j]) ? pImage[i][j] : iMax;
+      iMin = (iMin > pImage[i][j] && pImage[i][j] > 0) ? pImage[i][j] : iMin;
+    }
 };
 
 satellite::Image& satellite::Image::setShapes ( unsigned short x0, unsigned short y0, unsigned short dx, unsigned short dy, unsigned short radius, short distance, double err, satellite::Shape type, satellite::ShapeFill fill ) {
@@ -223,8 +249,8 @@ satellite::Image& satellite::Image::setShapes ( unsigned short x0, unsigned shor
 
   switch (fill) {
     case (satellite::ShapeFill::DEFAULT) :
-      for (unsigned short i = 0; i < countY; ++i)
-        for (unsigned short j = 0; j < countX; ++j) {
+      for (size_t i = 0; i < countY; ++i)
+        for (size_t j = 0; j < countX; ++j) {
           short dist_x = distribution(generator);
           short dist_y = distribution(generator);
           for (auto pr : lst) {
@@ -237,8 +263,8 @@ satellite::Image& satellite::Image::setShapes ( unsigned short x0, unsigned shor
         }
     break;
     case (satellite::ShapeFill::SOLID) :
-      for (unsigned short i = 0; i < countY; ++i)
-        for (unsigned short j = 0; j < countX; ++j) {
+      for (size_t i = 0; i < countY; ++i)
+        for (size_t j = 0; j < countX; ++j) {
           short dist_x = distribution(generator);
           short dist_y = distribution(generator);
           for (auto iter = lst.begin(); iter != lst.end();) {
@@ -258,5 +284,14 @@ satellite::Image& satellite::Image::setShapes ( unsigned short x0, unsigned shor
         }
     break;
   }
+
+  iMin = 0;
+  iMax = 1;
+  for (size_t i = 0; i < iHeight; ++i)
+    for (size_t j = 0; j < iWidth; ++j) {
+      iMax = (iMax < pImage[i][j]) ? pImage[i][j] : iMax;
+      iMin = (iMin > pImage[i][j] && pImage[i][j] > 0) ? pImage[i][j] : iMin;
+    }
+
   return *this;
 };

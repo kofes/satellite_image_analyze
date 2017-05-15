@@ -38,6 +38,12 @@ public:
   inline const short* operator[] ( unsigned short index ) const {
     return pImage[index];
   };
+  inline short min () {
+      return iMin;
+  };
+  inline short max () {
+      return iMax;
+  };
   void changeMaxMin ( unsigned short minColor, unsigned short maxColor );
   void cropColor ( unsigned short minColor, unsigned short maxColor );
   void binary ( unsigned short border );
@@ -56,6 +62,7 @@ private:
   }
   unsigned short iWidth, iHeight;
   short** pImage;
+  short iMin, iMax;
 };
 #pragma pack(pop)
 };
