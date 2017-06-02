@@ -74,6 +74,24 @@ Returns: ``double``
 
 Computes the "covariance" function of the vector *X* and vector *Y*
 
+##### threshold_Otsu ( X )
+
+Returns: ``std::pair<size_t, double>``
+
+Computes the Otsu's threshold and param SC of the vector *X*
+
+##### fft ( Src, Win )
+
+Returns: ``std::vector< std::complex<double> >``
+
+Makes Fast Fourier transform of the vector *Src* with function *Win*
+
+##### ifft ( Src )
+
+Returns: ``std::vector< std::complex<double> >``
+
+Makes Inverse fast Fourier transform of the vector *Src*
+
 #### Class Pack
 
 Class **Pack** is class-container, that contain the values of "drift", "covariance" and "semivariance" and method ``calc``:

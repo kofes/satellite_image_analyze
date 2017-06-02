@@ -55,7 +55,7 @@ std::queue< std::pair<short, short> > satellite::getPixelsInCircle ( short x0, s
   return result;
 };
 
-satellite::math::Pack satellite::math::Pack::calc (  short x0, short y0, short x1, short y1, double h, satellite::Image& picture  ) {
+satellite::math::Pack satellite::math::Pack::calc (  short x0, short y0, short x1, short y1, int h, satellite::Image& picture  ) {
   double m_h, m_0, s_0, s_h;
   m_h = m_0 = s_0 = s_h = 0;
   unsigned int count = 0;
@@ -65,7 +65,7 @@ satellite::math::Pack satellite::math::Pack::calc (  short x0, short y0, short x
     _err = true;
     return *this;
   }
-  if (h <= 1e-5 || !(x1 - x0) || !(y1 - y0))
+  if (h <= 0 || !(x1 - x0) || !(y1 - y0))
     return *this;
 
   for (int j = y0; j < y1; ++j)
@@ -591,3 +591,32 @@ std::pair<size_t, double> satellite::math::threshold_Otsu ( const std::vector< s
 
   return std::make_pair(threshold, sc_max);
 }
+
+std::vector< std::complex<double> > satellite::math::ifft(std::vector< std::complex<double> >& src) {
+  std::vector< std::complex<double> > res(src);
+  for (size_t i = 1, j = 0; i < res.size(); ++i) {
+    size_t bit = res.size() >> 1;
+    for (; j >= bit; bit >>= 1)
+      j -= bit;
+    j += bit;
+    if (i < j)
+      std::swap(res[i], res[j]);
+  }
+  for (size_t len = 2; len <= res.size(); len <<= 1) {
+    double arg = -2 * M_PI / len;
+    std::complex<double> wlen(std::cos(arg), std::sin(arg));
+    for (size_t i = 0; i < res.size(); i+=len) {
+      std::complex<double> w(1);
+      for (size_t j = 0; j < len/2; ++j) {
+        std::complex<double> u = res[i+j], v = res[i+j+len/2]*w;
+        res[i+j] = u+v;
+        res[i+j + len/2] = u-v;
+        w *= wlen;
+      }
+    }
+  }
+  for (size_t i = 0; i < res.size(); ++i)
+    res[i] /= res.size();
+
+  return res;
+};
