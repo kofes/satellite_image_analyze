@@ -1,9 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-t = 1.959964
-t_y = 3.983
-
 x = []
 y = []
 maxV, minV, dh = 0, 0, 0
@@ -16,7 +13,7 @@ def phi (u):
 def F (X, E, D):
     return (dh*sum(y)/np.sqrt(D))*phi((X-E)/np.sqrt(D))
 
-with open('test.var') as fp0:
+with open('output.var') as fp0:
     minV, maxV, dh = [int(x) for x in next(fp0).split()]
     print(minV, maxV, dh)
     for i in range(minV, maxV):
@@ -24,7 +21,7 @@ with open('test.var') as fp0:
         y.append(float(fp0.readline()))
     plt.plot(x, y, 'k-')
 
-with open('tmp.var') as fp1:
+with open('doubleput.var') as fp1:
     E1, D1 = [float(x) for x in next(fp1).split()]
     E1-=1
     E2, D2 = [float(x) for x in next(fp1).split()]
@@ -37,10 +34,6 @@ with open('tmp.var') as fp1:
     plt.plot((E2, E2), (0, max(y)), 'r-.')
     plt.plot((E2+np.sqrt(D2), E2+np.sqrt(D2)), (0, max(y)), 'y-.')
     plt.plot((E2-np.sqrt(D2), E2-np.sqrt(D2)), (0, max(y)), 'y-.')
-    D1 = (dh*sum(y) / (y[int(E1)-minV]))**2/(2*np.pi)
-    D2 = (dh*sum(y) / (y[int(E2)-minV]))**2/(2*np.pi)
-# plt.plot((E1+t*np.sqrt(D*((maxV-minV+1)/(maxV-minV))), E+t*np.sqrt(D*((maxV-minV+1)/(maxV-minV)))), (0, max(y)), 'r-')
-# plt.plot((E1-t*np.sqrt(D*((maxV-minV+1)/(maxV-minV))), E-t*np.sqrt(D*((maxV-minV+1)/(maxV-minV)))), (0, max(y)), 'r-')
 
 _X_ = np.arange(0, maxV, dh);
 _Y_ = F(_X_, E1, D1) + F(_X_, E2, D2)
