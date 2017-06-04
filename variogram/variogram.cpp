@@ -20,11 +20,18 @@ void create_variogram ( std::ifstream& input, std::ofstream& output ) {
 
   img.read(200, 200, input);
 
-  double h = 0.4;
-  while (h < std::sqrt(200*200 + 200*200)) {
+  for (int h = 0; h < std::sqrt(200*200 + 200*200); ++h) {
     output << math::g(0, 0, 200, 200, h, img) << std::endl;
-    h+=0.4;
+    if (h*100/std::sqrt(200*200 + 200*200) > (h-1)*100/std::sqrt(200*200 + 200*200)) {
+      std::cout << '\r';
+      std::cout.flush();
+      std::cout << "Calculation variogram: " << h*100/(int)(std::sqrt(200*200 + 200*200)) << "%";
+    }
   }
+  std::cout << '\r';
+  std::cout.flush();
+  std::cout << "Calculation variogram: 100 %";
+  std::cout << std::endl;
 }
 
 int main (int argc, char* argv[]) {
