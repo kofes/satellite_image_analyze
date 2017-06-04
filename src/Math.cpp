@@ -75,15 +75,49 @@ satellite::math::Pack satellite::math::Pack::calc (  short x0, short y0, short x
       int delta = 1 - 2*h;
       int err = 0;
       while (y >= 0) {
-        if (j + y < y1 && i + x < x1) {
-          ++count;
-          short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
-          short point_h = (picture[j+y][i+x] < 0) ? 0 : picture[j+y][i+x];
-          _drift += point_0 - point_h;
-          _covariance += point_0 * point_h;
-          _semivariance += (point_0 - point_h)*(point_0 - point_h);
-          m_0 += point_0;
-          m_h += point_h;
+        if (i+x < x1) {
+          if (j + y < y1) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            short point_h = (picture[j+y][i+x] < 0) ? 0 : picture[j+y][i+x];
+            _drift += point_h - point_0;
+            _covariance += point_0 * point_h;
+            _semivariance += (point_0 - point_h)*(point_0 - point_h);
+            m_0 += point_0;
+            m_h += point_h;
+          }
+          if (j - y >= y0) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            short point_h = (picture[j-y][i+x] < 0) ? 0 : picture[j-y][i+x];
+            _drift += point_h - point_0;
+            _covariance += point_0 * point_h;
+            _semivariance += (point_0 - point_h)*(point_0 - point_h);
+            m_0 += point_0;
+            m_h += point_h;
+          }
+        }
+        if (i-x >= x0) {
+          if (j + y < y1) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            short point_h = (picture[j+y][i-x] < 0) ? 0 : picture[j+y][i-x];
+            _drift += point_0 - point_h;
+            _covariance += point_0 * point_h;
+            _semivariance += (point_0 - point_h)*(point_0 - point_h);
+            m_0 += point_0;
+            m_h += point_h;
+          }
+          if (j - y >= y0) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            short point_h = (picture[j-y][i-x] < 0) ? 0 : picture[j-y][i-x];
+            _drift += point_0 - point_h;
+            _covariance += point_0 * point_h;
+            _semivariance += (point_0 - point_h)*(point_0 - point_h);
+            m_0 += point_0;
+            m_h += point_h;
+          }
         }
         err = 2 * (delta + y) - 1;
         if ((delta < 0) && (err <= 0)) {
@@ -150,10 +184,29 @@ double satellite::math::m0 ( short x0, short y0, short x1, short y1, int h, sate
       int delta = 1 - 2*h;
       int err = 0;
       while (y >= 0) {
-        if (j + y < y1 && i + x < x1) {
-          ++count;
-          short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
-          result += point_0;
+        if (i+x < x1) {
+          if (j + y < y1) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            result += point_0;
+          }
+          if (j - y >= y0) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            result += point_0;
+          }
+        }
+        if (i-x >= x0) {
+          if (j + y < y1) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            result += point_0;
+          }
+          if (j - y >= y0) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            result += point_0;
+          }
         }
         err = 2 * (delta + y) - 1;
         if ((delta < 0) && (err <= 0)) {
@@ -192,10 +245,29 @@ double satellite::math::mh ( short x0, short y0, short x1, short y1, int h, sate
         int delta = 1 - 2*h;
         int err = 0;
         while (y >= 0) {
-          if (j + y < y1 && i + x < x1) {
-            ++count;
-            short point_h = (picture[j+y][i+x] < 0) ? 0 : picture[j+y][i+x];
-            result += point_h;
+          if (i+x < x1) {
+            if (j + y < y1) {
+              ++count;
+              short point_h = (picture[j+y][i+x] < 0) ? 0 : picture[j+y][i+x];
+              result += point_h;
+            }
+            if (j - y >= y0) {
+              ++count;
+              short point_h = (picture[j-y][i+x] < 0) ? 0 : picture[j-y][i+x];
+              result += point_h;
+            }
+          }
+          if (i-x >= x0) {
+            if (j + y < y1) {
+              ++count;
+              short point_h = (picture[j+y][i-x] < 0) ? 0 : picture[j+y][i-x];
+              result += point_h;
+            }
+            if (j - y >= y0) {
+              ++count;
+              short point_h = (picture[j-y][i-x] < 0) ? 0 : picture[j-y][i-x];
+              result += point_h;
+            }
           }
           err = 2 * (delta + y) - 1;
           if ((delta < 0) && (err <= 0)) {
@@ -236,10 +308,29 @@ double satellite::math::s0 ( short x0, short y0, short x1, short y1, int h, sate
       int delta = 1 - 2*h;
       int err = 0;
       while (y >= 0) {
-        if (j + y < y1 && i + x < x1) {
-          ++count;
-          short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
-          result += (point_0 - dm)*(point_0 - dm);
+        if (i+x < x1) {
+          if (j + y < y1) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            result += (point_0 - dm)*(point_0 - dm);
+          }
+          if (j - y >= y0) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            result += (point_0 - dm)*(point_0 - dm);
+          }
+        }
+        if (i-x >= x0) {
+          if (j + y < y1) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            result += (point_0 - dm)*(point_0 - dm);
+          }
+          if (j - y >= y0) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            result += (point_0 - dm)*(point_0 - dm);
+          }
         }
         err = 2 * (delta + y) - 1;
         if ((delta < 0) && (err <= 0)) {
@@ -280,10 +371,29 @@ double satellite::math::sh ( short x0, short y0, short x1, short y1, int h, sate
       int delta = 1 - 2*h;
       int err = 0;
       while (y >= 0) {
-        if (j + y < y1 && i + x < x1) {
-          ++count;
-          short point_h = (picture[j+y][i+x] < 0) ? 0 : picture[j+y][i+x];
-          result += (point_h - dm)*(point_h - dm);
+        if (i+x < x1) {
+          if (j + y < y1) {
+            ++count;
+            short point_h = (picture[j+y][i+x] < 0) ? 0 : picture[j+y][i+x];
+            result += (point_h - dm)*(point_h - dm);
+          }
+          if (j - y >= y0) {
+            ++count;
+            short point_h = (picture[j-y][i+x] < 0) ? 0 : picture[j-y][i+x];
+            result += (point_h - dm)*(point_h - dm);
+          }
+        }
+        if (i-x >= x0) {
+          if (j + y < y1) {
+            ++count;
+            short point_h = (picture[j+y][i-x] < 0) ? 0 : picture[j+y][i-x];
+            result += (point_h - dm)*(point_h - dm);
+          }
+          if (j - y >= y0) {
+            ++count;
+            short point_h = (picture[j-y][i-x] < 0) ? 0 : picture[j-y][i-x];
+            result += (point_h - dm)*(point_h - dm);
+          }
         }
         err = 2 * (delta + y) - 1;
         if ((delta < 0) && (err <= 0)) {
@@ -322,11 +432,33 @@ double satellite::math::d ( short x0, short y0, short x1, short y1, int h, satel
       int delta = 1 - 2*h;
       int err = 0;
       while (y >= 0) {
-        if (j + y < y1 && i + x < x1) {
-          ++count;
-          short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
-          short point_h = (picture[j+y][i+x] < 0) ? 0 : picture[j+y][i+x];
-          result += point_h - point_0;
+        if (i+x < x1) {
+          if (j + y < y1) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            short point_h = (picture[j+y][i+x] < 0) ? 0 : picture[j+y][i+x];
+            result += point_h - point_0;
+          }
+          if (j - y >= y0) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            short point_h = (picture[j-y][i+x] < 0) ? 0 : picture[j-y][i+x];
+            result += point_h - point_0;
+          }
+        }
+        if (i-x >= x0) {
+          if (j + y < y1) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            short point_h = (picture[j+y][i-x] < 0) ? 0 : picture[j+y][i-x];
+            result += point_h - point_0;
+          }
+          if (j - y >= y0) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            short point_h = (picture[j-y][i-x] < 0) ? 0 : picture[j-y][i-x];
+            result += point_h - point_0;
+          }
         }
         err = 2 * (delta + y) - 1;
         if ((delta < 0) && (err <= 0)) {
@@ -365,11 +497,33 @@ double satellite::math::cov ( short x0, short y0, short x1, short y1, int h, sat
       int delta = 1 - 2*h;
       int err = 0;
       while (y >= 0) {
-        if (j + y < y1 && i + x < x1) {
-          ++count;
-          short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
-          short point_h = (picture[j+y][i+x] < 0) ? 0 : picture[j+y][i+x];
-          result += point_0 * point_h;
+        if (i+x < x1) {
+          if (j + y < y1) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            short point_h = (picture[j+y][i+x] < 0) ? 0 : picture[j+y][i+x];
+            result += point_0 * point_h;
+          }
+          if (j - y >= y0) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            short point_h = (picture[j-y][i+x] < 0) ? 0 : picture[j-y][i+x];
+            result += point_0 * point_h;
+          }
+        }
+        if (i-x >= x0) {
+          if (j + y < y1) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            short point_h = (picture[j+y][i-x] < 0) ? 0 : picture[j+y][i-x];
+            result += point_0 * point_h;
+          }
+          if (j - y >= y0) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            short point_h = (picture[j-y][i-x] < 0) ? 0 : picture[j-y][i-x];
+            result += point_0 * point_h;
+          }
         }
         err = 2 * (delta + y) - 1;
         if ((delta < 0) && (err <= 0)) {
@@ -418,11 +572,33 @@ double satellite::math::g ( short x0, short y0, short x1, short y1, int h, satel
       int delta = 1 - 2*h;
       int err = 0;
       while (y >= 0) {
-        if (j + y < y1 && i + x < x1) {
-          ++count;
-          short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
-          short point_h = (picture[j+y][i+x] < 0) ? 0 : picture[j+y][i+x];
-          result += (point_0 - point_h)*(point_0 - point_h);
+        if (i+x < x1) {
+          if (j + y < y1) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            short point_h = (picture[j+y][i+x] < 0) ? 0 : picture[j+y][i+x];
+            result += (point_0 - point_h)*(point_0 - point_h);
+          }
+          if (j - y >= y0) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            short point_h = (picture[j-y][i+x] < 0) ? 0 : picture[j-y][i+x];
+            result += (point_0 - point_h)*(point_0 - point_h);
+          }
+        }
+        if (i-x >= x0) {
+          if (j + y < y1) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            short point_h = (picture[j+y][i-x] < 0) ? 0 : picture[j+y][i-x];
+            result += (point_0 - point_h)*(point_0 - point_h);
+          }
+          if (j - y >= y0) {
+            ++count;
+            short point_0 = (picture[j][i] < 0) ? 0 : picture[j][i];
+            short point_h = (picture[j-y][i-x] < 0) ? 0 : picture[j-y][i-x];
+            result += (point_0 - point_h)*(point_0 - point_h);
+          }
         }
         err = 2 * (delta + y) - 1;
         if ((delta < 0) && (err <= 0)) {
