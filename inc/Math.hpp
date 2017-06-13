@@ -179,11 +179,11 @@ double cov ( const std::vector< std::pair<double, unsigned long> >& x, const std
 std::pair<size_t, double> threshold_Otsu ( const std::vector< std::pair<double, unsigned long> >& x );
 
 //Fast Fourier transform of vector
-template <typename Win, typename T>
-std::vector< std::complex<double> > fft(std::vector< T >& src, Win&& win ) {
+template <typename T>
+std::vector< std::complex<double> > fft(std::vector< T >& src) {
   std::vector< std::complex<double> > res(src.size());
   for (size_t i = 0; i < res.size(); ++i)
-    res[i] = src[i] * win(res.size() - i, res.size());
+    res[i] = src[i];
   for (size_t i = 1, j = 0; i < res.size(); ++i) {
     size_t bit = src.size() >> 1;
     for (; j >= bit; bit >>= 1)
@@ -211,5 +211,13 @@ std::vector< std::complex<double> > fft(std::vector< T >& src, Win&& win ) {
 //Inverse fast Fourier transform
 std::vector< std::complex<double> > ifft(std::vector< std::complex<double> >& src);
 
+//Window function
+template <typename Win, typename T>
+std::vector< T > tapering(std::vector< T >& src, Win&& win) {
+  std::vector< T > res(src);
+  for (size_t i = 0; i < res.size(); ++i)
+    res[i] *= win(i, res.size());
+  return res;
+};
 };
 };

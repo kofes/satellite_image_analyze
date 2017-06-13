@@ -18,10 +18,11 @@ int main() {
     vec[i] = f(i);
     input << i << ' ' << vec[i] << '\n';
   }
-  res = math::fft(vec, window::Hamming());
-  for (size_t i = 0; i < res.size(); ++i)
-    buff << std::atan(res[i].imag()/res[i].real()) << ' '
-         << std::sqrt(res[i].real()*res[i].real()+res[i].imag()*res[i].imag()) << '\n';
+  res = math::fft(vec);
+  res = math::tapering(res, window::Hamming());
+  for (size_t i = 0; i < res.size()/2; ++i)
+    buff << i << ' '
+         << 20*std::log(2*std::sqrt(res[i].real()*res[i].real()+res[i].imag()*res[i].imag())/res.size()) << '\n';
   res = math::ifft(res);
   for (size_t i = 0; i < res.size(); ++i) {
     output << i << ' ' << res[i].real() << '\n';

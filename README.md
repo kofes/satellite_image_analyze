@@ -80,17 +80,23 @@ Returns: ``std::pair<size_t, double>``
 
 Computes the Otsu's threshold and param SC of the vector *X*
 
-##### fft ( Src, Win )
+##### fft ( Src )
 
 Returns: ``std::vector< std::complex<double> >``
 
-Makes Fast Fourier transform of the vector *Src* with function *Win*
+Makes Fast Fourier transform of the vector *Src*
 
 ##### ifft ( Src )
 
 Returns: ``std::vector< std::complex<double> >``
 
 Makes Inverse fast Fourier transform of the vector *Src*
+
+##### tapering( Src, Win )
+
+Returns: ``std::vector<T>``
+
+Application of the *Win* function to the vector *Src*
 
 #### Class Pack
 
